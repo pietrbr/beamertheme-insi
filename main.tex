@@ -1,0 +1,102 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% __ Font: Fira Sans (free) — install: tlmgr install fira _____________________
+\usepackage[T1]{fontenc}
+\usepackage[sfdefault, light]{FiraSans}
+\usepackage[lining]{FiraMono}
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+% __ Theme _____________________________________________________________________
+\usetheme{InsiDark}
+
+% __ Metadata __________________________________________________________________
+\title{Presentation Title}
+\subtitle{A Concise Subtitle}
+\author[P.\ Brach del Prever]{Pietro Brach del Prever}
+\institute[NU / IINS]{Northeastern University \\ Institute for Intelligent Networked Systems}
+\date{April 2026}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% __ Title slide _______________________________________________________________
+% background canvas renders BEFORE content → image stays behind text
+{
+\setbeamertemplate{background}{}
+\setbeamertemplate{background canvas}{\InsiDarkBg}
+\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+}
+
+% __ Section separator _________________________________________________________
+\section{Introduction}
+\sectionframe
+
+% __ Content slide _____________________________________________________________
+\begin{frame}{Motivation}
+	\begin{itemize}
+		\item First key point.
+		\item Second key point with more detail.
+		      \begin{itemize}
+			      \item Supporting sub-point.
+		      \end{itemize}
+		\item Third point.
+	\end{itemize}
+\end{frame}
+
+% __ Two-column slide __________________________________________________________
+\begin{frame}{System Overview}
+	\begin{columns}[T]
+		\begin{column}{0.48\textwidth}
+			\textbf{Left column}\medskip\par
+			Describe the first component here.
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\textbf{Right column}\medskip\par
+			Describe the second component here.
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% __ Block slide _______________________________________________________________
+\begin{frame}{Blocks}
+	\begin{block}{Definition}            % nuBlue header
+		Formal definition or theorem.
+	\end{block}
+	\vskip0.5em
+	\begin{alertblock}{Key Result}       % nuTeal header
+		The main contribution or takeaway.
+	\end{alertblock}
+	\vskip0.5em
+	\begin{exampleblock}{Example}        % nuGold header, InsiDark text
+		A concrete illustrative example.
+	\end{exampleblock}
+\end{frame}
+
+% __ Section separator _________________________________________________________
+\section{Results}
+\sectionframe
+
+\begin{frame}{Results}
+	\begin{table}
+		\centering
+		\begin{tabular}{lcc}
+			\toprule
+			Method   & Metric A      & Metric B      \\
+			\midrule
+			Baseline & 12.3          & 45.6          \\
+			Proposed & \textbf{10.1} & \textbf{50.2} \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+
+% __ Closing slide _____________________________________________________________
+\closingframe{Thank you}{brachdelprever.p@northeastern.edu}
+
+\end{document}

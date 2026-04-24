@@ -1,0 +1,217 @@
+% beamerthemeInsiDark.sty — Minimal NU dark Beamer theme
+% Font: Fira Sans (free) — tlmgr install fira
+\ProvidesPackage{beamerthemeInsiDark}[2026/04/23]
+
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  COLOR PALETTE — call any of these anywhere in your document:
+%    \textcolor{nuGold}{text}   \colorbox{InsiDark}{text}   \color{nuTeal}
+%
+%  InsiDark          #01091E  midnight navy    title / section / header bg
+%  nuGold          #FDBB45  yellow-gold      primary accent (bullets, subtitle…)
+%  nuMetallicGold  #A4804A  NU Gold PMS 871  example block header
+%  nuRed           #C8102E  NU Red  PMS 186  brand red
+%  nuTeal          #2CBBAB  teal             secondary accent
+%  nuLightBlue     #5BC9E1  sky blue         tertiary accent
+%  nuBlue          #006DB7  deep blue        definition block
+%  nuGray          #F4F4F4  light gray       block body background
+%  nuMid           #666666  mid-gray         footer / caption text
+% ═══════════════════════════════════════════════════════════════════════════════
+\definecolor{InsiDark}        {HTML}{01091E}
+\definecolor{nuGold}        {HTML}{FDBB45}
+\definecolor{nuMetallicGold}{HTML}{A4804A}
+\definecolor{nuRed}         {HTML}{C8102E}
+\definecolor{nuTeal}        {HTML}{2CBBAB}
+\definecolor{nuLightBlue}   {HTML}{5BC9E1}
+\definecolor{nuBlue}        {HTML}{006DB7}
+\definecolor{nuGray}        {HTML}{F4F4F4}
+\definecolor{nuMid}         {HTML}{666666}
+
+% __ Beamer color roles ________________________________________________________
+\setbeamercolor{normal text}  {fg=black, bg=white}
+\setbeamercolor{alerted text} {fg=nuTeal}
+\setbeamercolor{structure}    {fg=InsiDark}
+
+% Title-page text: white for legibility on dark background
+\setbeamercolor{title}    {fg=white}
+\setbeamercolor{subtitle} {fg=nuGold}
+\setbeamercolor{author}   {fg=white}
+\setbeamercolor{institute}{fg=white!90}
+\setbeamercolor{date}     {fg=white!80}
+
+% Frametitle: no bg fill — the background template draws the image behind it
+\setbeamercolor{frametitle}{fg=white, bg=}
+
+% Blocks
+\setbeamercolor{block title}         {fg=white,  bg=nuBlue}
+\setbeamercolor{block body}          {fg=black,  bg=nuGray}
+\setbeamercolor{block title alerted} {fg=white,  bg=nuTeal}
+\setbeamercolor{block body  alerted} {fg=black,  bg=nuTeal!12}
+\setbeamercolor{block title example} {fg=InsiDark, bg=nuMetallicGold}
+\setbeamercolor{block body  example} {fg=black,  bg=nuMetallicGold!15}
+
+% Lists
+\setbeamercolor{itemize item}       {fg=nuGold}
+\setbeamercolor{itemize subitem}    {fg=nuTeal}
+\setbeamercolor{itemize subsubitem} {fg=nuLightBlue}
+\setbeamercolor{enumerate item}     {fg=nuGold}
+\setbeamercolor{enumerate subitem}  {fg=nuTeal}
+
+\setbeamercolor{footline}{fg=nuMid, bg=white}
+
+% __ Fonts _____________________________________________________________________
+\setbeamerfont{title}      {size=\LARGE, series=\bfseries}
+\setbeamerfont{subtitle}   {size=\large, series=\normalfont}
+\setbeamerfont{author}     {size=\normalsize}
+\setbeamerfont{institute}  {size=\small}
+\setbeamerfont{date}       {size=\small}
+\setbeamerfont{frametitle} {size=\large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{footline}   {size=\tiny}
+
+% __ Navigation / headline _____________________________________________________
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{itemize item}      {\raisebox{0.15ex}{\small\textbullet}}
+\setbeamertemplate{itemize subitem}   {\raisebox{0.15ex}{\footnotesize--}}
+\setbeamertemplate{itemize subsubitem}{\raisebox{0.15ex}{\scriptsize\textbullet}}
+
+% __ Content-slide background: bg-dark image clipped to frametitle strip _______
+% Rendered BEFORE frame content → sits behind frametitle text.
+% Shows the BOTTOM of the image (the dense dot-wave region) in the header strip.
+% Dark (plain) frames suppress this via \setbeamertemplate{background}{} in their group.
+\newlength{\nuframeht}
+\setlength{\nuframeht}{3.15em}
+\newlength{\nubgshift}  % computed at begin-document when \paperheight is known
+
+\AtBeginDocument{\setlength{\nubgshift}{\dimexpr\paperheight-\nuframeht\relax}}
+
+\setbeamertemplate{background}{%
+	\begin{tikzpicture}
+		\useasboundingbox (0pt, 0pt) rectangle (\paperwidth, \paperheight);
+		\begin{scope}
+			\clip (0pt, \nubgshift) rectangle (\paperwidth, \paperheight);
+			% anchor=south west → image bottom sits at the clip boundary;
+			% the clip then reveals only the very bottom strip of the image.
+			\node[anchor=south west, inner sep=0pt] at (0pt, \nubgshift) {%
+				\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
+			};
+		\end{scope}
+	\end{tikzpicture}%
+}
+
+% __ Frametitle: transparent colorbox (image comes from background) _____________
+\setbeamertemplate{frametitle}{%
+	\nointerlineskip
+	\begin{beamercolorbox}[wd=\paperwidth, leftskip=1.1em, rightskip=1.1em]{frametitle}%
+		% vbox of fixed height with vfil → text is vertically centred
+		\vbox to \nuframeht{%
+			\vfil
+			\usebeamerfont{frametitle}\insertframetitle
+			\ifx\insertframesubtitle\empty\else
+				{\hspace{0.5em}\small\normalfont\color{nuGold}%
+					\guillemotright\,\insertframesubtitle}%
+			\fi
+			\vfil
+		}%
+	\end{beamercolorbox}%
+}
+
+% __ Footline: page numbers only, no bar _______________________________________
+\setbeamertemplate{footline}{%
+	\vskip0.3em
+	\hspace{1.1em}%
+	{\usebeamerfont{footline}\color{nuMid}%
+		\insertshortauthor
+		\ifx\insertshortinstitute\empty\else\ \textbar\ \insertshortinstitute\fi}%
+	\hfill
+	{\usebeamerfont{footline}\color{nuMid}%
+		\insertframenumber\,/\,\inserttotalframenumber\hspace{1.1em}}%
+	\vskip0.3em
+}
+
+% __ Full dark background (for background canvas on dark slides) _______________
+% NOTE: named without @ so it can be called directly from .tex files.
+\newcommand{\InsiDarkBg}{%
+	\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
+}
+
+% __ Logo: capital-N monogram, title + closing slides only ____________________
+\newcommand{\nuLogos}{%
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[anchor=north east, inner sep=0.04\paperwidth]
+		at (current page.north east) {%
+			\includegraphics[height=0.25\paperheight]{assets/logo-insi}%
+		};
+	\end{tikzpicture}%
+}
+
+% __ Title page ________________________________________________________________
+% Usage in main.tex:
+%   { \setbeamertemplate{background canvas}{\InsiDarkBg}
+%     \setbeamertemplate{footline}{}
+%     \begin{frame}[plain]\titlepage\end{frame} }
+\setbeamertemplate{title page}{%
+	\nuLogos
+	\vspace{0.15\paperheight}
+	\begin{beamercolorbox}[leftskip=0.08\paperwidth, rightskip=0.08\paperwidth]{title}%
+		\usebeamerfont{title}\inserttitle\par
+		\ifx\insertsubtitle\empty\else
+			\vskip0.5em
+			{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle}\par
+		\fi
+	\end{beamercolorbox}
+	\vskip9.0em
+	\begin{beamercolorbox}[leftskip=0.08\paperwidth]{author}%
+		\usebeamerfont{author}\insertauthor\par
+		\vskip0.25em
+		{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
+		\vskip0.2em
+		{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
+	\end{beamercolorbox}
+}
+
+% __ Section page ______________________________________________________________
+\newcommand{\sectionframe}{%
+	{%
+			\setbeamertemplate{background}{}%
+			\setbeamertemplate{background canvas}{%
+				\begin{tikzpicture}
+					\useasboundingbox (0pt, 0pt) rectangle (\paperwidth, \paperheight);
+					\node[anchor=south west, inner sep=0pt] at (0pt, 0pt) {%
+						\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
+					};
+				\end{tikzpicture}%
+			}%
+			\setbeamertemplate{footline}{}%
+			\begin{frame}[plain]
+				\vfill
+				\begin{center}
+					{\Large\bfseries\color{white}\insertsectionhead}
+				\end{center}
+				\vfill
+			\end{frame}%
+		}%
+}
+
+% __ Closing slide _____________________________________________________________
+% Usage: \closingframe{Thank you}{your@email.edu}
+\newcommand{\closingframe}[2]{%
+	{%
+			\setbeamertemplate{background}{}%
+			\setbeamertemplate{background canvas}{\InsiDarkBg}%
+			\setbeamertemplate{footline}{}%
+			\begin{frame}[plain]
+				\nuLogos
+				\vfill
+				\begin{center}
+					{\Large\bfseries\color{white}#1}\\[0.9em]
+					{\color{white!80}\small #2}
+				\end{center}
+				\vfill
+			\end{frame}%
+		}%
+}
