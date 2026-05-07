@@ -2,6 +2,9 @@
 % Font: Fira Sans (free) — tlmgr install fira
 \ProvidesPackage{beamerthemeInsiDark}[2026/04/23]
 
+\RequirePackage[T1]{fontenc}
+\RequirePackage[sfdefault, light]{FiraSans}
+\RequirePackage[lining]{FiraMono}
 \RequirePackage{tikz}
 \RequirePackage{graphicx}
 
@@ -39,7 +42,8 @@
 \setbeamercolor{subtitle} {fg=nuGold}
 \setbeamercolor{author}   {fg=white}
 \setbeamercolor{institute}{fg=white!90}
-\setbeamercolor{date}     {fg=white!80}
+\setbeamercolor{event}    {fg=white!80}
+\setbeamercolor{date}     {fg=white!70}
 
 % Frametitle: no bg fill — the background template draws the image behind it
 \setbeamercolor{frametitle}{fg=white, bg=}
@@ -63,10 +67,11 @@
 
 % __ Fonts _____________________________________________________________________
 \setbeamerfont{title}      {size=\LARGE, series=\bfseries}
-\setbeamerfont{subtitle}   {size=\large, series=\normalfont}
+\setbeamerfont{subtitle}   {size=\small, series=\normalfont}
 \setbeamerfont{author}     {size=\normalsize}
-\setbeamerfont{institute}  {size=\small}
-\setbeamerfont{date}       {size=\small}
+\setbeamerfont{institute}  {size=\footnotesize}
+\setbeamerfont{event}      {size=\footnotesize}
+\setbeamerfont{date}       {size=\footnotesize, shape=\itshape}
 \setbeamerfont{frametitle} {size=\large, series=\bfseries}
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamerfont{footline}   {size=\tiny}
@@ -106,7 +111,7 @@
 % __ Frametitle: transparent colorbox (image comes from background) _____________
 \setbeamertemplate{frametitle}{%
 	\nointerlineskip
-	\begin{beamercolorbox}[wd=\paperwidth, leftskip=1.1em, rightskip=1.1em]{frametitle}%
+	\begin{beamercolorbox}[wd=\paperwidth, leftskip=1.0em, rightskip=1.0em]{frametitle}%
 		% vbox of fixed height with vfil → text is vertically centred
 		\vbox to \nuframeht{%
 			\vfil
@@ -122,15 +127,16 @@
 
 % __ Footline: page numbers only, no bar _______________________________________
 \setbeamertemplate{footline}{%
-	\vskip0.3em
-	\hspace{1.1em}%
-	{\usebeamerfont{footline}\color{nuMid}%
-		\insertshortauthor
-		\ifx\insertshortinstitute\empty\else\ \textbar\ \insertshortinstitute\fi}%
-	\hfill
-	{\usebeamerfont{footline}\color{nuMid}%
-		\insertframenumber\,/\,\inserttotalframenumber\hspace{1.1em}}%
-	\vskip0.3em
+	\begin{beamercolorbox}[wd=\paperwidth, rightskip=0.8em]{footline}%
+		\vskip0.3em
+		\hskip1.1em
+		{\usebeamerfont{footline}\color{nuMid}%
+		\insertshortauthor}%
+		\hfill
+		{\usebeamerfont{footline}\color{nuMid}%
+			\insertframenumber\,/\,\inserttotalframenumber}%
+		\vskip0.3em
+	\end{beamercolorbox}%
 }
 
 % __ Full dark background (for background canvas on dark slides) _______________
@@ -142,50 +148,60 @@
 % __ Logo: capital-N monogram, title + closing slides only ____________________
 \newcommand{\nuLogos}{%
 	\begin{tikzpicture}[remember picture, overlay]
-		\node[anchor=north east, inner sep=0.04\paperwidth]
+		\node[anchor=north east, inner sep=0.02\paperwidth]
 		at (current page.north east) {%
-			\includegraphics[height=0.25\paperheight]{assets/logo-insi}%
+			\includegraphics[height=0.16\paperheight]{assets/logo-insi}%
 		};
 	\end{tikzpicture}%
 }
 
+% __ Event metadata (like \date / \institute but for conference name) __________
+% Usage: \event{IEEE INFOCOM 2026 Workshop on 6G AI-RAN}
+\newcommand{\event}[1]{\def\insertevent{#1}}
+\def\insertevent{}
+
 % __ Title page ________________________________________________________________
 % Usage in main.tex:
+%   \event{Conference Name}
 %   { \setbeamertemplate{background canvas}{\InsiDarkBg}
 %     \setbeamertemplate{footline}{}
 %     \begin{frame}[plain]\titlepage\end{frame} }
 \setbeamertemplate{title page}{%
 	\nuLogos
-	\vspace{0.15\paperheight}
-	\begin{beamercolorbox}[leftskip=0.08\paperwidth, rightskip=0.08\paperwidth]{title}%
-		\usebeamerfont{title}\inserttitle\par
-		\ifx\insertsubtitle\empty\else
-			\vskip0.5em
-			{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle}\par
-		\fi
-	\end{beamercolorbox}
-	\vskip9.0em
-	\begin{beamercolorbox}[leftskip=0.08\paperwidth]{author}%
-		\usebeamerfont{author}\insertauthor\par
-		\vskip0.25em
-		{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
-		\vskip0.2em
-		{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
-	\end{beamercolorbox}
+	\vbox to \paperheight{%
+		\vspace{0.15\paperheight}
+		\begin{beamercolorbox}[leftskip=0.04\paperwidth, rightskip=0.2\paperwidth]{title}%
+			\usebeamerfont{title}\inserttitle\par
+			\ifx\insertsubtitle\empty\else
+				\vskip0.9em
+				{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}%
+				\let\@stcr\\\def\\{\@stcr[-0.9em]}% this regulates the line spacing for the subtitle
+				\insertsubtitle}\par
+			\fi
+		\end{beamercolorbox}
+		\vfill
+		\begin{beamercolorbox}[leftskip=0.04\paperwidth]{author}%
+			\usebeamerfont{author}\insertauthor\par
+			\ifx\insertinstitute\empty\else
+				\vskip0.25em
+				{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
+			\fi
+			\ifx\insertevent\empty\else
+				\vskip0.2em
+				{\usebeamerfont{event}\usebeamercolor[fg]{event}\insertevent}\par
+			\fi
+			\vskip0.2em
+			{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
+		\end{beamercolorbox}
+		\vspace{0.05\paperheight}
+	}%
 }
 
 % __ Section page ______________________________________________________________
 \newcommand{\sectionframe}{%
 	{%
 			\setbeamertemplate{background}{}%
-			\setbeamertemplate{background canvas}{%
-				\begin{tikzpicture}
-					\useasboundingbox (0pt, 0pt) rectangle (\paperwidth, \paperheight);
-					\node[anchor=south west, inner sep=0pt] at (0pt, 0pt) {%
-						\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
-					};
-				\end{tikzpicture}%
-			}%
+			\setbeamertemplate{background canvas}{\InsiDarkBg}%
 			\setbeamertemplate{footline}{}%
 			\begin{frame}[plain]
 				\vfill
