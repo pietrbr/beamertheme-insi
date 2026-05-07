@@ -1,12 +1,31 @@
-% beamerthemeInsiDark.sty — Minimal NU dark Beamer theme
-% Font: Fira Sans (free) — tlmgr install fira
-\ProvidesPackage{beamerthemeInsiDark}[2026/04/23]
+%% beamerthemeInsiDark.sty — Minimal NU dark Beamer theme
+%%
+%% Copyright (C) 2026 Pietro Brach del Prever
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008 or later.
+%%
+%% This work has its LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Pietro Brach del Prever.
+%%
+%% Font: Fira Sans (free) — tlmgr install fira
+\ProvidesPackage{beamerthemeInsiDark}[2026/05/07 v1.0 Minimal NU dark Beamer theme]
 
 \RequirePackage[T1]{fontenc}
 \RequirePackage[sfdefault, light]{FiraSans}
 \RequirePackage[lining]{FiraMono}
 \RequirePackage{tikz}
 \RequirePackage{graphicx}
+\RequirePackage{currfile}
+% Capture the package's own directory at load time so assets/ is found
+% regardless of where the document is compiled from.
+\edef\beamerthemeInsiDark@dir{\currfiledir}
+\AtBeginDocument{\graphicspath{{\beamerthemeInsiDark@dir assets/}}}
 
 % ═══════════════════════════════════════════════════════════════════════════════
 %  COLOR PALETTE — call any of these anywhere in your document:

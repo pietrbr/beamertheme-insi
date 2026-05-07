@@ -1,0 +1,226 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  framerule=0pt,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  breaklines=true,
+}
+
+\title{\textsf{beamerthemeInsiDark} --- Minimal NU dark Beamer theme\\[4pt]
+  \large Version 1.0}
+\author{Pietro Brach del Prever\\
+  \small\href{mailto:brachdelprever.p@northeastern.edu}{brachdelprever.p@northeastern.edu}}
+\date{2026/05/07}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+	\textsf{beamerthemeInsiDark} is a minimal dark Beamer theme for
+	Northeastern University / IINS presentations.  It features a midnight-navy
+	header strip with a textured background image, gold accent color, Fira Sans
+	typography, and convenience commands for section separators, closing slides,
+	and event metadata.
+\end{abstract}
+
+\section{Requirements}
+
+\begin{itemize}
+	\item \textsf{FiraSans} and \textsf{FiraMono} ---
+	      \texttt{tlmgr install fira}
+	\item \textsf{tikz}, \textsf{graphicx} (part of standard TeX Live / MacTeX)
+	\item \textsf{currfile} (part of standard TeX Live / MacTeX)
+	\item \texttt{assets/bg-dark.png} and \texttt{assets/logo-insi.png} ---
+	      bundled with this package
+\end{itemize}
+
+The theme finds its own \texttt{assets/} directory automatically via
+\textsf{currfile}, so no assets need to be copied into the document project.
+
+\section{Installation}
+
+Symlink the package directory into the personal TEXMF tree (macOS/MacTeX):
+
+\begin{lstlisting}
+ln -s /path/to/beamer-template \
+      ~/Library/texmf/tex/latex/beamerthemeInsiDark
+\end{lstlisting}
+
+After that, \verb|\usetheme{InsiDark}| resolves from any document on the
+system.  Verify with:
+
+\begin{lstlisting}
+kpsewhich beamerthemeInsiDark.sty
+\end{lstlisting}
+
+\section{Loading the theme}
+
+\begin{lstlisting}
+\documentclass[aspectratio=169, 10pt]{beamer}
+\usetheme{InsiDark}
+\end{lstlisting}
+
+\section{Metadata commands}
+
+Standard Beamer metadata (\verb|\title|, \verb|\subtitle|, \verb|\author|,
+\verb|\institute|, \verb|\date|) is used as usual.  The theme adds one extra
+command:
+
+\begin{quote}
+	\verb|\event{|\textit{name}\verb|}|
+\end{quote}
+
+Sets the conference or event name shown on the title page below the institute
+line.
+
+\section{Slide commands}
+
+\subsection{Title slide}
+
+The title page must be placed inside a group that sets the full-bleed dark
+background canvas:
+
+\begin{lstlisting}
+{
+  \setbeamertemplate{background}{}
+  \setbeamertemplate{background canvas}{\InsiDarkBg}
+  \setbeamertemplate{footline}{}
+  \begin{frame}[plain]
+    \titlepage
+  \end{frame}
+}
+\end{lstlisting}
+
+\subsection{\texttt{\textbackslash sectionframe}}
+
+Inserts a dark full-bleed slide that displays the current section name
+centered in white.  Call it immediately after \verb|\section{...}|:
+
+\begin{lstlisting}
+\section{Results}
+\sectionframe
+\end{lstlisting}
+
+\subsection{\texttt{\textbackslash closingframe\{msg\}\{contact\}}}
+
+Inserts a dark closing slide with a large message and a contact line:
+
+\begin{lstlisting}
+\closingframe{Thank you}{your@email.edu}
+\end{lstlisting}
+
+\subsection{\texttt{\textbackslash InsiDarkBg}}
+
+An \verb|\includegraphics| call that tiles the full-bleed background image
+to the slide dimensions.  Use it as the argument to
+\verb|\setbeamertemplate{background canvas}{...}| for any custom dark slide.
+
+\subsection{\texttt{\textbackslash nuLogos}}
+
+Overlays the INSI monogram logo at the top-right corner of the current slide
+using a TikZ \texttt{remember picture, overlay} node.  Used automatically on
+the title slide; can be called on any custom dark frame.
+
+\section{Color palette}
+
+All colors are defined globally and can be used anywhere via
+\verb|\textcolor{name}{...}|, \verb|\colorbox{name}{...}|, etc.
+
+\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{lll}
+		\toprule
+		Name                    & Hex               & Role                                 \\
+		\midrule
+		\texttt{InsiDark}       & \texttt{\#01091E} & Header / section background          \\
+		\texttt{nuGold}         & \texttt{\#FDBB45} & Primary accent, bullets, subtitle    \\
+		\texttt{nuMetallicGold} & \texttt{\#A4804A} & Example block header                 \\
+		\texttt{nuRed}          & \texttt{\#C8102E} & NU brand red                         \\
+		\texttt{nuTeal}         & \texttt{\#2CBBAB} & Alert block header, secondary accent \\
+		\texttt{nuLightBlue}    & \texttt{\#5BC9E1} & Tertiary accent                      \\
+		\texttt{nuBlue}         & \texttt{\#006DB7} & Definition block header              \\
+		\texttt{nuGray}         & \texttt{\#F4F4F4} & Block body background                \\
+		\texttt{nuMid}          & \texttt{\#666666} & Footer / caption text                \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+\section{Full example}
+
+The file \texttt{main.tex} (included in this package) is a complete working
+template demonstrating all slide types.  It compiles with:
+
+\begin{lstlisting}
+pdflatex main.tex
+\end{lstlisting}
+
+The minimal skeleton:
+
+\begin{lstlisting}
+\documentclass[aspectratio=169, 10pt]{beamer}
+\usepackage{microtype}
+\usetheme{InsiDark}
+
+\title{Presentation Title}
+\subtitle{A Concise Subtitle}
+\author[P.\ Brach del Prever]{Pietro Brach del Prever}
+\institute[NU / IINS]{Northeastern University \\
+                      Institute for Intelligent Networked Systems}
+\event{IEEE INFOCOM 2026 Workshop}
+\date{May 2026}
+
+\begin{document}
+
+% Title slide
+{
+  \setbeamertemplate{background}{}
+  \setbeamertemplate{background canvas}{\InsiDarkBg}
+  \setbeamertemplate{footline}{}
+  \begin{frame}[plain]\titlepage\end{frame}
+}
+
+\section{Introduction}
+\sectionframe
+
+\begin{frame}{Motivation}
+  \begin{itemize}
+    \item First key point.
+    \item Second key point.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Blocks}
+  \begin{block}{Definition}
+    Formal statement.
+  \end{block}
+  \begin{alertblock}{Key Result}
+    Main contribution.
+  \end{alertblock}
+  \begin{exampleblock}{Example}
+    Concrete illustration.
+  \end{exampleblock}
+\end{frame}
+
+\closingframe{Thank you}{your@email.edu}
+
+\end{document}
+\end{lstlisting}
+
+\section{License}
+
+This work is released under the \LaTeX\ Project Public License,
+version~1.3c or later.
+See \url{https://www.latex-project.org/lppl.txt}.
+
+\end{document}
