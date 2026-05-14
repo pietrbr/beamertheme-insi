@@ -20,6 +20,8 @@
 \RequirePackage[sfdefault, light]{FiraSans}
 \RequirePackage[lining]{FiraMono}
 \RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\usepgfplotslibrary{colorbrewer}
 \RequirePackage{graphicx}
 \RequirePackage{currfile}
 % Capture the package's own directory at load time so assets/ is found
@@ -28,37 +30,35 @@
 \AtBeginDocument{\graphicspath{{\beamerthemeInsiDark@dir assets/}}}
 
 % ═══════════════════════════════════════════════════════════════════════════════
-%  COLOR PALETTE — call any of these anywhere in your document:
-%    \textcolor{nuGold}{text}   \colorbox{InsiDark}{text}   \color{nuTeal}
+%  COLOR PALETTE
 %
-%  InsiDark          #01091E  midnight navy    title / section / header bg
-%  nuGold          #FDBB45  yellow-gold      primary accent (bullets, subtitle…)
-%  nuMetallicGold  #A4804A  NU Gold PMS 871  example block header
-%  nuRed           #C8102E  NU Red  PMS 186  brand red
-%  nuTeal          #2CBBAB  teal             secondary accent
-%  nuLightBlue     #5BC9E1  sky blue         tertiary accent
-%  nuBlue          #006DB7  deep blue        definition block
-%  nuGray          #F4F4F4  light gray       block body background
-%  nuMid           #666666  mid-gray         footer / caption text
+%  Theme palette is the colorbrewer "Paired" 12-color set.
+%  Light / dark pairs: A/B (blue), C/D (green), E/F (red), G/H (orange),
+%                      I/J (purple), K/L (yellow / brown).
+%
+%  Reserved neutrals:
+%    InsiDark   #01091E  midnight navy    title / section / header bg
+%    themeMid   #666666  mid-gray         footer / caption text
+%    themeBg    #F4F4F4  light gray       neutral block body background
+%
+%  Title-slide only (do not use elsewhere in the deck):
+%    nuGold     #FDBB45  yellow-gold      title-page subtitle accent
 % ═══════════════════════════════════════════════════════════════════════════════
-\definecolor{InsiDark}        {HTML}{01091E}
-\definecolor{nuGold}        {HTML}{FDBB45}
-\definecolor{nuMetallicGold}{HTML}{A4804A}
-\definecolor{nuRed}         {HTML}{C8102E}
-\definecolor{nuTeal}        {HTML}{2CBBAB}
-\definecolor{nuLightBlue}   {HTML}{5BC9E1}
-\definecolor{nuBlue}        {HTML}{006DB7}
-\definecolor{nuGray}        {HTML}{F4F4F4}
-\definecolor{nuMid}         {HTML}{666666}
+\definecolor{InsiDark}{HTML}{01091E}
+\definecolor{themeMid}{HTML}{666666}
+\definecolor{themeBg} {HTML}{F4F4F4}
+\definecolor{nuGold}  {HTML}{FDBB45} % title slide only
+
+% Paired-A .. Paired-L come from the colorbrewer pgfplots library loaded above.
 
 % __ Beamer color roles ________________________________________________________
 \setbeamercolor{normal text}  {fg=black, bg=white}
-\setbeamercolor{alerted text} {fg=nuTeal}
+\setbeamercolor{alerted text} {fg=Paired-F}
 \setbeamercolor{structure}    {fg=InsiDark}
 
 % Title-page text: white for legibility on dark background
 \setbeamercolor{title}    {fg=white}
-\setbeamercolor{subtitle} {fg=nuGold}
+\setbeamercolor{subtitle} {fg=nuGold}      % title slide only
 \setbeamercolor{author}   {fg=white}
 \setbeamercolor{institute}{fg=white!90}
 \setbeamercolor{event}    {fg=white!80}
@@ -67,22 +67,22 @@
 % Frametitle: no bg fill — the background template draws the image behind it
 \setbeamercolor{frametitle}{fg=white, bg=}
 
-% Blocks
-\setbeamercolor{block title}         {fg=white,  bg=nuBlue}
-\setbeamercolor{block body}          {fg=black,  bg=nuGray}
-\setbeamercolor{block title alerted} {fg=white,  bg=nuTeal}
-\setbeamercolor{block body  alerted} {fg=black,  bg=nuTeal!12}
-\setbeamercolor{block title example} {fg=InsiDark, bg=nuMetallicGold}
-\setbeamercolor{block body  example} {fg=black,  bg=nuMetallicGold!15}
+% Blocks (Paired: blue = info, red = alert, green = example)
+\setbeamercolor{block title}         {fg=white,    bg=Paired-B}
+\setbeamercolor{block body}          {fg=black,    bg=themeBg}
+\setbeamercolor{block title alerted} {fg=white,    bg=Paired-F}
+\setbeamercolor{block body  alerted} {fg=black,    bg=Paired-E!25}
+\setbeamercolor{block title example} {fg=white,    bg=Paired-D}
+\setbeamercolor{block body  example} {fg=black,    bg=Paired-C!25}
 
-% Lists
-\setbeamercolor{itemize item}       {fg=nuGold}
-\setbeamercolor{itemize subitem}    {fg=nuTeal}
-\setbeamercolor{itemize subsubitem} {fg=nuLightBlue}
-\setbeamercolor{enumerate item}     {fg=nuGold}
-\setbeamercolor{enumerate subitem}  {fg=nuTeal}
+% Lists — plain black bullets
+\setbeamercolor{itemize item}       {fg=black}
+\setbeamercolor{itemize subitem}    {fg=black}
+\setbeamercolor{itemize subsubitem} {fg=black}
+\setbeamercolor{enumerate item}     {fg=black}
+\setbeamercolor{enumerate subitem}  {fg=black}
 
-\setbeamercolor{footline}{fg=nuMid, bg=white}
+\setbeamercolor{footline}{fg=themeMid, bg=white}
 
 % __ Fonts _____________________________________________________________________
 \setbeamerfont{title}      {size=\LARGE, series=\bfseries}
@@ -136,7 +136,7 @@
 			\vfil
 			\usebeamerfont{frametitle}\insertframetitle
 			\ifx\insertframesubtitle\empty\else
-				{\hspace{0.5em}\small\normalfont\color{nuGold}%
+				{\hspace{0.5em}\small\normalfont\color{Paired-A}%
 					\guillemotright\,\insertframesubtitle}%
 			\fi
 			\vfil

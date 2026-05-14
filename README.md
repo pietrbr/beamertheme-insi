@@ -1,12 +1,13 @@
 # beamerthemeInsiDark
 
 A minimal dark Beamer theme for Northeastern University / IINS presentations.
-Dark navy background, gold accent, Fira Sans typography.
+Dark navy background, ColorBrewer Paired palette for content, Fira Sans typography.
 
 ## Requirements
 
 - `FiraSans` and `FiraMono` — `tlmgr install fira`
-- `tikz`, `graphicx`, `currfile` (all included in a standard MacTeX/TeX Live installation)
+- `tikz`, `pgfplots` (with the `colorbrewer` library), `graphicx`, `currfile`
+  (all included in a standard MacTeX/TeX Live installation)
 - `assets/bg-dark.png` and `assets/logo-insi.png` — bundled in this repo
 
 ## Installation
@@ -68,17 +69,22 @@ into each project.
 
 ## Color Palette
 
-| Name             | Hex       | Role                                 |
-| ---------------- | --------- | ------------------------------------ |
-| `InsiDark`       | `#01091E` | Title/section/header background      |
-| `nuGold`         | `#FDBB45` | Primary accent (bullets, subtitle)   |
-| `nuMetallicGold` | `#A4804A` | Example block header                 |
-| `nuRed`          | `#C8102E` | NU brand red                         |
-| `nuTeal`         | `#2CBBAB` | Alert block header, secondary accent |
-| `nuLightBlue`    | `#5BC9E1` | Tertiary accent                      |
-| `nuBlue`         | `#006DB7` | Definition block header              |
-| `nuGray`         | `#F4F4F4` | Block body background                |
-| `nuMid`          | `#666666` | Footer / caption text                |
+Content colors come from the ColorBrewer `Paired` 12-color set (loaded via the
+`pgfplots` colorbrewer library) as `Paired-A` through `Paired-L`. Light/dark
+pairs: A/B (blue), C/D (green), E/F (red), G/H (orange), I/J (purple),
+K/L (yellow / brown). Use any of them with `\textcolor{Paired-B}{...}`, etc.
+
+Reserved neutrals and accent:
+
+| Name       | Hex       | Role                                            |
+| ---------- | --------- | ----------------------------------------------- |
+| `InsiDark` | `#01091E` | Title / section / header background             |
+| `themeMid` | `#666666` | Footer / caption text                           |
+| `themeBg`  | `#F4F4F4` | Neutral block body background                   |
+| `nuGold`   | `#FDBB45` | Title-slide subtitle accent (title slide only)  |
+
+Default block colors: `Paired-B` (info), `Paired-F` (alert), `Paired-D`
+(example). Bullets are plain black.
 
 ## License
 

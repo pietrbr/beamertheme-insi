@@ -29,9 +29,9 @@
 \begin{abstract}
 	\textsf{beamerthemeInsiDark} is a minimal dark Beamer theme for
 	Northeastern University / IINS presentations.  It features a midnight-navy
-	header strip with a textured background image, gold accent color, Fira Sans
-	typography, and convenience commands for section separators, closing slides,
-	and event metadata.
+	header strip with a textured background image, the ColorBrewer
+	\texttt{Paired} palette for content, Fira Sans typography, and convenience
+	commands for section separators, closing slides, and event metadata.
 \end{abstract}
 
 \section{Requirements}
@@ -39,7 +39,8 @@
 \begin{itemize}
 	\item \textsf{FiraSans} and \textsf{FiraMono} ---
 	      \texttt{tlmgr install fira}
-	\item \textsf{tikz}, \textsf{graphicx} (part of standard TeX Live / MacTeX)
+	\item \textsf{tikz}, \textsf{pgfplots} (with the \texttt{colorbrewer}
+	      library), \textsf{graphicx} (part of standard TeX Live / MacTeX)
 	\item \textsf{currfile} (part of standard TeX Live / MacTeX)
 	\item \texttt{assets/bg-dark.png} and \texttt{assets/logo-insi.png} ---
 	      bundled with this package
@@ -134,27 +135,33 @@ the title slide; can be called on any custom dark frame.
 
 \section{Color palette}
 
-All colors are defined globally and can be used anywhere via
-\verb|\textcolor{name}{...}|, \verb|\colorbox{name}{...}|, etc.
+Content colors come from the ColorBrewer \texttt{Paired} 12-color set, loaded
+via the \textsf{pgfplots} \texttt{colorbrewer} library.  They are available as
+\texttt{Paired-A} through \texttt{Paired-L} and can be used anywhere via
+\verb|\textcolor{Paired-B}{...}|, \verb|\colorbox{Paired-D}{...}|, etc.
+Light/dark pairs: A/B (blue), C/D (green), E/F (red), G/H (orange),
+I/J (purple), K/L (yellow / brown).
+
+The theme also defines a handful of reserved neutrals and a title-slide
+accent:
 
 \begin{center}
 	\renewcommand{\arraystretch}{1.3}
 	\begin{tabular}{lll}
 		\toprule
-		Name                    & Hex               & Role                                 \\
+		Name              & Hex               & Role                                           \\
 		\midrule
-		\texttt{InsiDark}       & \texttt{\#01091E} & Header / section background          \\
-		\texttt{nuGold}         & \texttt{\#FDBB45} & Primary accent, bullets, subtitle    \\
-		\texttt{nuMetallicGold} & \texttt{\#A4804A} & Example block header                 \\
-		\texttt{nuRed}          & \texttt{\#C8102E} & NU brand red                         \\
-		\texttt{nuTeal}         & \texttt{\#2CBBAB} & Alert block header, secondary accent \\
-		\texttt{nuLightBlue}    & \texttt{\#5BC9E1} & Tertiary accent                      \\
-		\texttt{nuBlue}         & \texttt{\#006DB7} & Definition block header              \\
-		\texttt{nuGray}         & \texttt{\#F4F4F4} & Block body background                \\
-		\texttt{nuMid}          & \texttt{\#666666} & Footer / caption text                \\
+		\texttt{InsiDark} & \texttt{\#01091E} & Title / section / header background            \\
+		\texttt{themeMid} & \texttt{\#666666} & Footer / caption text                          \\
+		\texttt{themeBg}  & \texttt{\#F4F4F4} & Neutral block body background                  \\
+		\texttt{nuGold}   & \texttt{\#FDBB45} & Title-slide subtitle accent (title slide only) \\
 		\bottomrule
 	\end{tabular}
 \end{center}
+
+Default block colors are \texttt{Paired-B} (info / standard block),
+\texttt{Paired-F} (alert), and \texttt{Paired-D} (example).  Itemize and
+enumerate bullets are plain black.
 
 \section{Full example}
 
