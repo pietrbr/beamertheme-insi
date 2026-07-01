@@ -12,11 +12,14 @@ Dark navy background, ColorBrewer Paired palette for content, Fira Sans typograp
 
 ## Installation
 
-Symlink or copy the repo into your personal TEXMF tree:
+Run the install script to symlink the theme into your personal TEXMF tree
+(`$(kpsewhich -var-value TEXMFHOME)/tex/latex/beamerthemeInsiDark`):
 
 ```bash
-ln -s /path/to/beamer-template ~/Library/texmf/tex/latex/beamerthemeInsiDark
+./install.sh              # link; ./install.sh --uninstall to remove
 ```
+
+Or by hand: `ln -s "$(pwd)" ~/Library/texmf/tex/latex/beamerthemeInsiDark`.
 
 After that, `\usetheme{InsiDark}` works from any document. The theme locates
 its own `assets/` folder automatically via `currfile` — no need to copy assets
