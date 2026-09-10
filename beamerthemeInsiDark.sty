@@ -16,18 +16,68 @@
 %% Font: Fira Sans (free) — tlmgr install fira
 \ProvidesPackage{beamerthemeInsiDark}[2026/05/07 v1.0 Minimal NU dark Beamer theme]
 
+% __ Theme options _____________________________________________________________
+% \usetheme[acronyms, algorithms]{InsiDark}
+%   acronyms   -- load glossaries configured for acronyms only; the document still
+%                 supplies its own \input{acronyms.tex}
+%   algorithms -- load algorithm2e and style it for slides
+\newif\ifInsiDark@acronyms
+\newif\ifInsiDark@algorithms
+\DeclareOptionBeamer{acronyms}{\InsiDark@acronymstrue}
+\DeclareOptionBeamer{algorithms}{\InsiDark@algorithmstrue}
+\ProcessOptionsBeamer
+
 \RequirePackage[T1]{fontenc}
 \RequirePackage[sfdefault, light]{FiraSans}
 \RequirePackage[lining]{FiraMono}
+
+% The body default is Light, and Fira carries several weights between it and bold:
+% book, regular (m), medium, sb. The .fd files declare them all; NFSS has no series
+% key for the middle ones, so expose the two worth reaching for. `\mdseries' is not
+% one of them -- in NFSS that means series `m', which the light option maps to Light.
+\DeclareRobustCommand{\regularseries}{\fontseries{regular}\selectfont}
+\DeclareTextFontCommand{\textregular}{\regularseries}
+\DeclareRobustCommand{\mediumseries}{\fontseries{medium}\selectfont}
+\DeclareTextFontCommand{\textmedium}{\mediumseries}
+\DeclareRobustCommand{\sbseries}{\fontseries{sb}\selectfont}
+\DeclareTextFontCommand{\textsb}{\sbseries}
 \RequirePackage{tikz}
 \RequirePackage{pgfplots}
 \usepgfplotslibrary{colorbrewer}
 \RequirePackage{graphicx}
 \RequirePackage{currfile}
+\RequirePackage{etoolbox}
+\RequirePackage{microtype}
+
+\ifInsiDark@acronyms
+	% No \makeglossaries: nothing is printed, so \gls expands in place and the
+	% document needs no makeindex pass.
+	\RequirePackage[acronym, acronyms, nonumberlist, nopostdot, nomain, nogroupskip,
+		acronymlists={hidden}]{glossaries}
+	\glsdisablehyper
+\fi
+
+\ifInsiDark@algorithms
+	\RequirePackage[ruled, vlined, linesnumbered]{algorithm2e}
+	\SetAlFnt{\small}
+	\SetAlCapFnt{\color{InsiDark}\sbseries}
+	\SetAlCapNameFnt{\color{InsiDark}}
+	% \SetNlSty wraps its first argument in \csname...\endcsname, so it takes a
+	% command NAME, not a declaration: \SetNlSty{\color{themeMid}} expands to
+	% \csname \color {themeMid}\endcsname and errors. Hand it a one-argument macro.
+	\newcommand{\InsiDark@nlsty}[1]{{\color{themeMid}#1}}
+	\SetNlSty{InsiDark@nlsty}{}{}
+\fi
 % Capture the package's own directory at load time so assets/ is found
 % regardless of where the document is compiled from.
 \edef\beamerthemeInsiDark@dir{\currfiledir}
-\AtBeginDocument{\graphicspath{{\beamerthemeInsiDark@dir assets/}}}
+% Append, never assign: \graphicspath replaces the whole search list, so a plain
+% \graphicspath here would discard the document's own figure directories.
+\AtBeginDocument{%
+	\@ifundefined{Ginput@path}%
+	{\graphicspath{{\beamerthemeInsiDark@dir assets/}}}%
+	{\g@addto@macro\Ginput@path{{\beamerthemeInsiDark@dir assets/}}}%
+}
 
 % ═══════════════════════════════════════════════════════════════════════════════
 %  COLOR PALETTE
@@ -39,15 +89,17 @@
 %  Reserved neutrals:
 %    InsiDark   #01091E  midnight navy    title / section / header bg
 %    themeMid   #666666  mid-gray         footer / caption text
-%    themeBg    #F4F4F4  light gray       neutral block body background
+%    themeBg    #F4F4F4  light gray       neutral surface
 %
-%  Title-slide only (do not use elsewhere in the deck):
-%    nuGold     #FDBB45  yellow-gold      title-page subtitle accent
+%  Accent:
+%    nuGold     #FDBB45  yellow-gold      title-page subtitle, default block title
+%                                         (carries InsiDark text, not white: white on
+%                                         gold is 1.7:1, dark navy on gold is 11.4:1)
 % ═══════════════════════════════════════════════════════════════════════════════
 \definecolor{InsiDark}{HTML}{01091E}
 \definecolor{themeMid}{HTML}{666666}
 \definecolor{themeBg} {HTML}{F4F4F4}
-\definecolor{nuGold}  {HTML}{FDBB45} % title slide only
+\definecolor{nuGold}  {HTML}{FDBB45}
 
 % Paired-A .. Paired-L come from the colorbrewer pgfplots library loaded above.
 
@@ -58,7 +110,7 @@
 
 % Title-page text: white for legibility on dark background
 \setbeamercolor{title}    {fg=white}
-\setbeamercolor{subtitle} {fg=nuGold}      % title slide only
+\setbeamercolor{subtitle} {fg=nuGold}
 \setbeamercolor{author}   {fg=white}
 \setbeamercolor{institute}{fg=white!90}
 \setbeamercolor{event}    {fg=white!80}
@@ -67,10 +119,12 @@
 % Frametitle: no bg fill — the background template draws the image behind it
 \setbeamercolor{frametitle}{fg=white, bg=}
 
-% Blocks (Paired: blue = info, red = alert, green = example)
-\setbeamercolor{block title}         {fg=white,    bg=Paired-B}
-\setbeamercolor{block body}          {fg=black,    bg=themeBg}
-\setbeamercolor{block title alerted} {fg=white,    bg=Paired-F}
+% Blocks (gold = default callout, red = alert, green = example). Alert titles sit
+% on the light red of the pair, not the strong one: black on Paired-E is 10.1:1,
+% and the body tint still reads a step lighter than the bar.
+\setbeamercolor{block title}         {fg=InsiDark, bg=nuGold}
+\setbeamercolor{block body}          {fg=black,    bg=nuGold!25}
+\setbeamercolor{block title alerted} {fg=black,    bg=Paired-E}
 \setbeamercolor{block body  alerted} {fg=black,    bg=Paired-E!25}
 \setbeamercolor{block title example} {fg=white,    bg=Paired-D}
 \setbeamercolor{block body  example} {fg=black,    bg=Paired-C!25}
@@ -103,12 +157,100 @@
 \setbeamertemplate{itemize subitem}   {\raisebox{0.15ex}{\footnotesize--}}
 \setbeamertemplate{itemize subsubitem}{\raisebox{0.15ex}{\scriptsize\textbullet}}
 
+% __ Blocks ____________________________________________________________________
+% Beamer always typesets the title bar, so `\begin{block}{}' leaves an empty
+% coloured strip above the body. Make the title optional instead: an empty
+% argument gives a body-only block. Titles are centred over the body.
+% Padding between the coloured edge and the text, in both bars; documents retune it.
+\newlength{\nublockpad}
+\setlength{\nublockpad}{0.5em}
+\newcommand{\InsiDark@blockbegin}[2]{% #1 = title element, #2 = body element
+	\par\vskip\medskipamount%
+	\ifdefempty{\insertblocktitle}{}{%
+		\begin{beamercolorbox}[colsep*=.75ex, sep=\nublockpad, center]{#1}%
+			\usebeamerfont*{#1}\insertblocktitle%
+		\end{beamercolorbox}\noframebreak%
+		{\parskip0pt\par}%
+		\ifbeamercolorempty[bg]{#1}{}{%
+			\ifbeamercolorempty[bg]{#2}{}{\nointerlineskip\vskip-0.5pt}}%
+	}%
+	\usebeamerfont{#2}%
+	\begin{beamercolorbox}[colsep*=.75ex, sep=\nublockpad, vmode]{#2}%
+	\ifbeamercolorempty[bg]{#2}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+}
+\setbeamertemplate{block begin}        {\InsiDark@blockbegin{block title}{block body}}
+\setbeamertemplate{block alerted begin}{\InsiDark@blockbegin{block title alerted}{block body alerted}}
+\setbeamertemplate{block example begin}{\InsiDark@blockbegin{block title example}{block body example}}
+
+% __ Narrower content __________________________________________________________
+% A minipage sets \textwidth (latex.ltx, \@iiiminipage), and beamer sizes blocks,
+% figures, and tables from \textwidth -- so wrapping them narrows them. \centering
+% centres the minipage itself without the \topsep a `center' environment adds.
+\newenvironment{narrow}[1][0.7\textwidth]{%
+	\par\centering\begin{minipage}{#1}}{%
+	\end{minipage}\par}
+
+% __ Table of contents _________________________________________________________
+% Beamer hardcodes \vskip1.5em between \tableofcontents entries (see
+% \beamer@sectionintoc in beamerbasetoc.sty), a value tuned for four-section decks;
+% a talk with eight sections runs off the frame. Redirect it to a length the
+% document can retune. The empty failure branch makes the patch a no-op if a beamer
+% release changes that string, so the deck still builds.
+% The branch only runs when subsections are hidden -- with them shown beamer uses
+% \vfill instead and spreads the entries down the frame.
+\newlength{\nutocsep}
+\setlength{\nutocsep}{0.7em}
+\patchcmd{\beamer@sectionintoc}{\vskip1.5em}{\vskip\nutocsep}{}{}
+
+% A square instead of a number: the outline says what the parts are, not which
+% section is the fifth.
+\setbeamercolor{section in toc}{fg=InsiDark}
+\setbeamertemplate{section in toc}{%
+	\leavevmode
+	{\color{Paired-B}\rule[0.22ex]{0.42em}{0.42em}}\hspace{0.55em}%
+	{\usebeamercolor[fg]{section in toc}\inserttocsection}\par}
+
+% __ Figure captions and takeaways _____________________________________________
+% Two ranks under a figure. The caption says what you are looking at and belongs to
+% the float, so it is a real \caption. The takeaway says why it matters; it is the
+% argument of the slide, appears under tables and lists too, and there is only one
+% caption slot per float, so it stays a free-standing box outside.
+%
+% Same type as the takeaway, so the pair reads as one family; colour is what
+% separates them -- grey describes the figure, Paired-B argues from it.
+\setbeamercolor{caption}{fg=themeMid}
+\setbeamerfont{caption} {size=\large, series=\regularseries}
+
+% Caption text only: a slide has no figure list and no cross-references, so the
+% "Figure N:" label is noise. Killing the separator too keeps beamer from leaving
+% its stub behind.
+\setbeamertemplate{caption label separator}{}
+\setbeamertemplate{caption}{%
+	{\usebeamerfont{caption}\usebeamercolor[fg]{caption}\centering\insertcaption\par}%
+}
+% Document values assume a floating figure with body text above and below.
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{0pt}
+
+\setbeamercolor{takeaway}{fg=Paired-B}
+\setbeamerfont{takeaway} {size=\large, series=\regularseries}
+\newcommand{\takeaway}[1]{%
+	\par\vspace{5pt}%
+	{\usebeamerfont{takeaway}\usebeamercolor[fg]{takeaway}\centering#1\par}%
+}
+
 % __ Content-slide background: bg-dark image clipped to frametitle strip _______
 % Rendered BEFORE frame content → sits behind frametitle text.
 % Shows the BOTTOM of the image (the dense dot-wave region) in the header strip.
 % Dark (plain) frames suppress this via \setbeamertemplate{background}{} in their group.
 \newlength{\nuframeht}
 \setlength{\nuframeht}{3.15em}
+% beamercolorbox ADDS leftskip and rightskip to wd, so wd=\paperwidth with a 1em
+% inset each side made the frametitle strip 20pt wider than the page (an overfull
+% hbox on every titled frame). Hold the inset in a fixed length and subtract it
+% back out, so the two cancel exactly whatever 1em resolves to here.
+\newlength{\nuframeinset}
+\setlength{\nuframeinset}{1em}
 \newlength{\nubgshift}  % computed at begin-document when \paperheight is known
 
 \AtBeginDocument{\setlength{\nubgshift}{\dimexpr\paperheight-\nuframeht\relax}}
@@ -121,7 +263,7 @@
 			% anchor=south west → image bottom sits at the clip boundary;
 			% the clip then reveals only the very bottom strip of the image.
 			\node[anchor=south west, inner sep=0pt] at (0pt, \nubgshift) {%
-				\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
+				\includegraphics[width=\paperwidth, height=\paperheight]{bg-dark}%
 			};
 		\end{scope}
 	\end{tikzpicture}%
@@ -130,9 +272,18 @@
 % __ Frametitle: transparent colorbox (image comes from background) _____________
 \setbeamertemplate{frametitle}{%
 	\nointerlineskip
-	\begin{beamercolorbox}[wd=\paperwidth, leftskip=1.0em, rightskip=1.0em]{frametitle}%
+	\begin{beamercolorbox}[wd=\paperwidth]{frametitle}%
 		% vbox of fixed height with vfil → text is vertically centred
 		\vbox to \nuframeht{%
+			% Inset here, not as beamercolorbox leftskip/rightskip: those do not shrink
+			% the box's \hsize, so every titled frame reported an overfull hbox of
+			% exactly their sum. The box has no fill (bg= is empty; the dark strip is
+			% the background template), so only the text position matters.
+			% \rightskip=\nuframeinset plus 1fil would typeset "plus 1fil": TeX stops
+			% scanning for a stretch component once the value came from a register.
+			\leftskip=\nuframeinset
+			\rightskip=\nuframeinset
+			\InsiDark@nohyphens
 			\vfil
 			\usebeamerfont{frametitle}\insertframetitle
 			\ifx\insertframesubtitle\empty\else
@@ -144,16 +295,66 @@
 	\end{beamercolorbox}%
 }
 
+% __ Hyperlinks ________________________________________________________________
+% Beamer leaves links uncoloured and `structure' is #01091E, so a URL or citation is
+% indistinguishable from body text. Colour the outward-facing ones. Internal links
+% take xcolor's "." -- the current colour -- so hyperref repaints nothing and the
+% surrounding template decides: the `section in toc' template below keeps its colour,
+% and the white text on the dark section page survives. Pinning them to InsiDark
+% instead made \insertsectionhead (beamer wraps it in \hyperlink) navy on navy,
+% i.e. invisible, on every section page.
+\hypersetup{
+	colorlinks=true,
+	linkcolor=.,
+	urlcolor=Paired-B,
+	citecolor=Paired-B,
+}
+\urlstyle{same} % a URL is body text, not a monospace intrusion
+
+% __ Bibliography ______________________________________________________________
+% Look only -- the theme does not choose a bibliography engine for the document.
+\setbeamertemplate{bibliography item}[text] % a number, not beamer's book icon
+\setbeamercolor{bibliography item}            {fg=themeMid}
+\setbeamercolor{bibliography entry author}    {fg=black}
+\setbeamercolor{bibliography entry title}     {fg=black}
+\setbeamercolor{bibliography entry location}  {fg=themeMid}
+\setbeamercolor{bibliography entry note}      {fg=themeMid}
+\setbeamerfont{bibliography item}             {size=\footnotesize}
+\setbeamerfont{bibliography entry author}     {size=\footnotesize}
+\setbeamerfont{bibliography entry title}      {size=\footnotesize}
+\setbeamerfont{bibliography entry location}   {size=\footnotesize}
+\setbeamerfont{bibliography entry note}       {size=\footnotesize}
+% biblatex has its own font hook and ignores the beamer fonts above.
+\AtBeginDocument{\@ifpackageloaded{biblatex}{\renewcommand*{\bibfont}{\footnotesize}}{}}
+
+% __ Backup slides: keep them out of the main deck's frame total _______________
+% \appendix hides its sections from \tableofcontents, but beamer still counts the
+% frames after it in \inserttotalframenumber, so a deck with backup material reports
+% "3 / 50" on slide 3 of a 44-slide talk. Snapshot the count where \appendix runs and
+% write it to the .aux, so the next pass reports the main deck's own total. Falls back
+% to beamer's number on the first pass, or when the deck has no \appendix.
+% Backup frames then restart at 1 and are labelled rather than numbered out of the
+% main total, so "Backup 2" can be called out in Q&A without reading as slide 49/47.
+\newcommand{\InsiDark@maintotal}{\inserttotalframenumber}
+\newif\ifInsiDark@appendix
+\pretocmd{\appendix}{%
+	\immediate\write\@auxout{%
+		\noexpand\gdef\noexpand\InsiDark@maintotal{\the\value{framenumber}}}%
+	\global\InsiDark@appendixtrue
+	\setcounter{framenumber}{0}%
+}{}{}
+
 % __ Footline: page numbers only, no bar _______________________________________
 \setbeamertemplate{footline}{%
 	\begin{beamercolorbox}[wd=\paperwidth, rightskip=0.8em]{footline}%
 		\vskip0.3em
 		\hskip1.1em
-		{\usebeamerfont{footline}\color{nuMid}%
-		\insertshortauthor}%
+			{\usebeamerfont{footline}\color{themeMid}%
+				\insertshortauthor}%
 		\hfill
-		{\usebeamerfont{footline}\color{nuMid}%
-			\insertframenumber\,/\,\inserttotalframenumber}%
+		{\usebeamerfont{footline}\color{themeMid}%
+			\ifInsiDark@appendix Backup~\insertframenumber
+			\else \insertframenumber\,/\,\InsiDark@maintotal\fi}%
 		\vskip0.3em
 	\end{beamercolorbox}%
 }
@@ -161,7 +362,7 @@
 % __ Full dark background (for background canvas on dark slides) _______________
 % NOTE: named without @ so it can be called directly from .tex files.
 \newcommand{\InsiDarkBg}{%
-	\includegraphics[width=\paperwidth, height=\paperheight]{assets/bg-dark}%
+	\includegraphics[width=\paperwidth, height=\paperheight]{bg-dark}%
 }
 
 % __ Logo: capital-N monogram, title + closing slides only ____________________
@@ -169,7 +370,7 @@
 	\begin{tikzpicture}[remember picture, overlay]
 		\node[anchor=north east, inner sep=0.02\paperwidth]
 		at (current page.north east) {%
-			\includegraphics[height=0.16\paperheight]{assets/logo-insi}%
+			\includegraphics[height=0.16\paperheight]{logo-insi}%
 		};
 	\end{tikzpicture}%
 }
@@ -178,6 +379,18 @@
 % Usage: \event{IEEE INFOCOM 2026 Workshop on 6G AI-RAN}
 \newcommand{\event}[1]{\def\insertevent{#1}}
 \def\insertevent{}
+
+% __ Display type: no hyphenation ______________________________________________
+% A word broken across lines by an inserted hyphen reads as a typo in display type,
+% so forbid both automatic hyphenation and breaking at an explicit hyphen. The
+% colorbox already narrowed the measure with a rightskip; add stretch to it rather
+% than assigning, so lines may end short instead of going overfull, and the box
+% keeps the space it reserved on the right.
+\newcommand{\InsiDark@nohyphens}{%
+	\hyphenpenalty=10000\relax
+	\exhyphenpenalty=10000\relax
+	\advance\rightskip 0pt plus 1fil\relax
+}
 
 % __ Title page ________________________________________________________________
 % Usage in main.tex:
@@ -190,63 +403,69 @@
 	\vbox to \paperheight{%
 		\vspace{0.15\paperheight}
 		\begin{beamercolorbox}[leftskip=0.04\paperwidth, rightskip=0.2\paperwidth]{title}%
+			\InsiDark@nohyphens
 			\usebeamerfont{title}\inserttitle\par
 			\ifx\insertsubtitle\empty\else
 				\vskip0.9em
-				{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}%
-				\let\@stcr\\\def\\{\@stcr[-0.9em]}% this regulates the line spacing for the subtitle
-				\insertsubtitle}\par
+					{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}%
+						\let\@stcr\\\def\\{\@stcr[-0.9em]}% this regulates the line spacing for the subtitle
+						\insertsubtitle}\par
 			\fi
 		\end{beamercolorbox}
 		\vfill
 		\begin{beamercolorbox}[leftskip=0.04\paperwidth]{author}%
+			\InsiDark@nohyphens
 			\usebeamerfont{author}\insertauthor\par
 			\ifx\insertinstitute\empty\else
 				\vskip0.25em
-				{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
+					{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
 			\fi
 			\ifx\insertevent\empty\else
 				\vskip0.2em
-				{\usebeamerfont{event}\usebeamercolor[fg]{event}\insertevent}\par
+					{\usebeamerfont{event}\usebeamercolor[fg]{event}\insertevent}\par
 			\fi
 			\vskip0.2em
-			{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
+				{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
 		\end{beamercolorbox}
 		\vspace{0.05\paperheight}
 	}%
 }
 
 % __ Section page ______________________________________________________________
+% A divider carries one short line on an empty dark page, so it is sized well above
+% a frame title. Beamer's own `section title' font, so a deck with long section
+% names can dial it back without redefining \sectionframe.
+\setbeamerfont{section title}{size=\Huge, series=\bfseries}
 \newcommand{\sectionframe}{%
 	{%
-			\setbeamertemplate{background}{}%
-			\setbeamertemplate{background canvas}{\InsiDarkBg}%
-			\setbeamertemplate{footline}{}%
-			\begin{frame}[plain]
-				\vfill
-				\begin{center}
-					{\Large\bfseries\color{white}\insertsectionhead}
-				\end{center}
-				\vfill
-			\end{frame}%
-		}%
+		\setbeamertemplate{background}{}%
+		\setbeamertemplate{background canvas}{\InsiDarkBg}%
+		\setbeamertemplate{footline}{}%
+		\begin{frame}[plain]
+			\vfill
+			\begin{center}
+				{\usebeamerfont{section title}\color{white}\insertsectionhead}
+			\end{center}
+			\vfill
+		\end{frame}%
+	}%
 }
 
 % __ Closing slide _____________________________________________________________
 % Usage: \closingframe{Thank you}{your@email.edu}
 \newcommand{\closingframe}[2]{%
 	{%
-			\setbeamertemplate{background}{}%
-			\setbeamertemplate{background canvas}{\InsiDarkBg}%
-			\setbeamertemplate{footline}{}%
-			\begin{frame}[plain]
-				\nuLogos
-				\vfill
-				\begin{center}
-					{\Large\bfseries\color{white}#1}\\[0.9em]
-					{\color{white!80}\small #2}
-				\end{center}
-				\vfill
-			\end{frame}%
-		}%
+		\setbeamertemplate{background}{}%
+		\setbeamertemplate{background canvas}{\InsiDarkBg}%
+		\setbeamertemplate{footline}{}%
+		\begin{frame}[plain]
+			\nuLogos
+			\vfill
+			\begin{center}
+				{\Large\bfseries\color{white}#1}\\[0.9em]
+				{\color{white!80}\small #2}
+			\end{center}
+			\vfill
+		\end{frame}%
+	}%
 }
