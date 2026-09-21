@@ -1,0 +1,33 @@
+%% beamerthemeInsiDark-figure.sty -- deck-matching setup for standalone figures
+%%
+%% Copyright (C) 2026 Pietro Brach del Prever
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008 or later.
+%%
+%% This work has its LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Pietro Brach del Prever.
+%%
+%% Font: Fira Sans (free) -- tlmgr install fira; sans math needs `sansmath'.
+\ProvidesPackage{beamerthemeInsiDark-figure}[2026/09/21 v1.0 InsiDark figure companion]
+
+% A figure compiled into its own PDF (the externalized-TikZ model: one PDF per
+% figure, which the deck \includegraphics) is not a beamer document, so it cannot
+% \usetheme{InsiDark} and would fall back to Computer Modern at OT1. Two things then
+% break, and both are caused by the theme rather than by the figure: the face no
+% longer matches the slide, and the OT1/T1 mismatch misrenders <, >, | and accented
+% characters -- in the figures only. This package carries the theme's font decisions
+% across that boundary. Load it from the figure preamble.
+%
+% Deliberately no palette: a figure's data colours belong to the document, not here.
+\RequirePackage[T1]{fontenc}
+\RequirePackage[sfdefault, light]{FiraSans}
+
+% A serif formula on a sans axis reads as wrongly as a serif tick label does.
+\RequirePackage{sansmath}
+\AtBeginDocument{\sansmath}

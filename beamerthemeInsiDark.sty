@@ -119,14 +119,15 @@
 % Frametitle: no bg fill — the background template draws the image behind it
 \setbeamercolor{frametitle}{fg=white, bg=}
 
-% Blocks (gold = default callout, red = alert, green = example). Alert titles sit
-% on the light red of the pair, not the strong one: black on Paired-E is 10.1:1,
-% and the body tint still reads a step lighter than the bar.
+% Blocks (gold = default callout, red = alert, green = example). Alert and example
+% titles sit on the light half of their pair, not the strong one, so both can carry
+% black text: black on Paired-E is 10.1:1 and on Paired-C 15.3:1, where white on
+% Paired-D is only 3.6:1. Each body tint reads a step lighter than its bar.
 \setbeamercolor{block title}         {fg=InsiDark, bg=nuGold}
 \setbeamercolor{block body}          {fg=black,    bg=nuGold!25}
 \setbeamercolor{block title alerted} {fg=black,    bg=Paired-E}
 \setbeamercolor{block body  alerted} {fg=black,    bg=Paired-E!25}
-\setbeamercolor{block title example} {fg=white,    bg=Paired-D}
+\setbeamercolor{block title example} {fg=black,    bg=Paired-C}
 \setbeamercolor{block body  example} {fg=black,    bg=Paired-C!25}
 
 % Lists — plain black bullets
@@ -157,26 +158,35 @@
 \setbeamertemplate{itemize subitem}   {\raisebox{0.15ex}{\footnotesize--}}
 \setbeamertemplate{itemize subsubitem}{\raisebox{0.15ex}{\scriptsize\textbullet}}
 
+% A slide carries figures and short lines, not paragraphs, so the article-tuned list
+% padding is too loose. \tightlist goes just after \begin{itemize} / \begin{enumerate}.
+\newlength{\nulistsep}
+\setlength{\nulistsep}{2pt}
+\newcommand{\tightlist}{%
+	\setlength{\itemsep}{\nulistsep}%
+	\setlength{\parskip}{0pt}%
+	\setlength{\topsep}{0pt}%
+}
+
 % __ Blocks ____________________________________________________________________
 % Beamer always typesets the title bar, so `\begin{block}{}' leaves an empty
 % coloured strip above the body. Make the title optional instead: an empty
-% argument gives a body-only block. Titles are centred over the body.
-% Padding between the coloured edge and the text, in both bars; documents retune it.
+% argument gives a body-only block. Titles are centred over the body, and title and
+% body are two separately rounded bars with a gap between them.
+% Inset scale between a bar's coloured edge and its text; the body takes twice the
+% title bar's share of it. Documents retune it.
 \newlength{\nublockpad}
 \setlength{\nublockpad}{0.5em}
 \newcommand{\InsiDark@blockbegin}[2]{% #1 = title element, #2 = body element
 	\par\vskip\medskipamount%
 	\ifdefempty{\insertblocktitle}{}{%
-		\begin{beamercolorbox}[colsep*=.75ex, sep=\nublockpad, center]{#1}%
-			\usebeamerfont*{#1}\insertblocktitle%
+		\begin{beamercolorbox}[rounded=true, colsep*=.35ex, sep=0.1\nublockpad, center]{#1}%
+			\usebeamerfont*{#1}\strut\insertblocktitle\strut%
 		\end{beamercolorbox}\noframebreak%
 		{\parskip0pt\par}%
-		\ifbeamercolorempty[bg]{#1}{}{%
-			\ifbeamercolorempty[bg]{#2}{}{\nointerlineskip\vskip-0.5pt}}%
 	}%
 	\usebeamerfont{#2}%
-	\begin{beamercolorbox}[colsep*=.75ex, sep=\nublockpad, vmode]{#2}%
-	\ifbeamercolorempty[bg]{#2}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+	\begin{beamercolorbox}[rounded=true, colsep*=.35ex, sep=0.2\nublockpad, vmode]{#2}%
 }
 \setbeamertemplate{block begin}        {\InsiDark@blockbegin{block title}{block body}}
 \setbeamertemplate{block alerted begin}{\InsiDark@blockbegin{block title alerted}{block body alerted}}
@@ -366,11 +376,19 @@
 }
 
 % __ Logo: capital-N monogram, title + closing slides only ____________________
+% \addlogo{<graphics>} in the preamble stacks a partner mark under the monogram,
+% flush right with it; once per mark, in the order they should appear.
+\newlength{\nulogosep}
+\setlength{\nulogosep}{0.5em}
+\newcommand{\InsiDark@extralogos}{}
+\newcommand{\addlogo}[1]{\g@addto@macro\InsiDark@extralogos{\\[\nulogosep] #1}}
 \newcommand{\nuLogos}{%
 	\begin{tikzpicture}[remember picture, overlay]
 		\node[anchor=north east, inner sep=0.02\paperwidth]
 		at (current page.north east) {%
-			\includegraphics[height=0.16\paperheight]{logo-insi}%
+			\shortstack[r]{%
+				\includegraphics[height=0.16\paperheight]{logo-insi}%
+				\InsiDark@extralogos}%
 		};
 	\end{tikzpicture}%
 }
@@ -447,6 +465,45 @@
 				{\usebeamerfont{section title}\color{white}\insertsectionhead}
 			\end{center}
 			\vfill
+		\end{frame}%
+	}%
+}
+
+% __ Statement slide ___________________________________________________________
+% One line on a dark gradient: the rhetorical beat between sections, a step above a
+% section divider. Usage: \statementframe[Frame title]{The line.}
+\setbeamercolor{statement}{fg=white}
+\setbeamerfont{statement}{size=\LARGE, series=\regularseries, shape=\itshape}
+\NewDocumentCommand{\statement}{O{0.68\textwidth} +m}{%
+	\parbox[t]{#1}{\raggedleft
+		\usebeamercolor[fg]{statement}\usebeamerfont{statement}#2\par}%
+}
+% One pair per stroke: offset in cm, downward from the topmost stroke, and opacity.
+\newcommand{\InsiDarkWaveStrokes}{0/.50,.32/.43,.64/.36,.96/.29,1.28/.22,1.60/.15}
+\newcommand{\InsiDarkWave}{%
+	\foreach \offset/\opacity in \InsiDarkWaveStrokes{%
+		\draw[Paired-A!80!white, opacity=\opacity, line width=.55pt]
+		([xshift=.02\paperwidth,yshift=3.25cm-\offset cm]current page.south west)
+		.. controls ([xshift=.25\paperwidth,yshift=4.45cm-\offset cm]current page.south west)
+		and ([xshift=.53\paperwidth,yshift=2.25cm-\offset cm]current page.south west)
+		.. ([xshift=.98\paperwidth,yshift=3.55cm-\offset cm]current page.south west);
+	}%
+}
+\newcommand{\InsiDarkStatementBg}{%
+	\begin{tikzpicture}[remember picture, overlay]
+		\path[shade, top color=InsiDark, bottom color=Paired-B!60!InsiDark]
+		(current page.north west) rectangle (current page.south east);
+		\InsiDarkWave
+	\end{tikzpicture}%
+}
+\NewDocumentCommand{\statementframe}{O{} +m}{%
+	{%
+		\setbeamertemplate{background}{}%
+		\setbeamertemplate{background canvas}{\InsiDarkStatementBg}%
+		\setbeamertemplate{footline}{}%
+		\begin{frame}[t]{#1}
+			\vspace*{0.12\textheight}
+			\hfill\statement{#2}
 		\end{frame}%
 	}%
 }
