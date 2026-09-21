@@ -63,7 +63,7 @@ into each project.
 \section{Introduction}
 \sectionframe   % dark section separator slide
 
-\begin{frame}{Frame Title}
+\begin{frame}{Frame Title}{Optional frame subtitle}
   Content here.
 \end{frame}
 
@@ -94,6 +94,66 @@ into each project.
 | `\mediumseries` / `\textmedium{...}`   | Fira Sans Medium -- two steps up                                                                                                  |
 | `\sbseries` / `\textsb{...}`           | Fira Sans SemiBold, one notch under bold                                                                                          |
 | `\takeaway{text}`                      | Coloured line under a figure/table saying why it matters; styled by the `takeaway` color/font                                     |
+| `\nuframeht`                           | Height of the dark frame-title strip (default `3.15em`); the background clip follows it                                           |
+| `\nublockpad`                          | Inset between a block bar's coloured edge and its text (default `0.5em`); the body bar takes twice the title bar's share          |
+
+## Frame subtitles
+
+A frame takes a second argument, shown after the title in the dark strip, in
+`Paired-A` and preceded by a guillemet:
+
+```latex
+\begin{frame}{Throughput}{measured on the testbed}
+```
+
+## Figures and takeaways
+
+Two ranks of text sit under a figure. The caption says what you are looking at,
+so it stays a real `\caption` inside the float. The takeaway says why it matters,
+and `\takeaway{...}` is a free-standing box, so it also works under a table or
+a list, where there is no caption slot.
+
+```latex
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{plot}
+  \caption{Goodput against offered load.}
+\end{figure}
+\takeaway{The baseline saturates at 30 Mbps; the proposed scheme does not.}
+```
+
+A slide has no list of figures and no cross-references, so the theme prints the
+caption text alone: no `Figure N:` label and no separator. Captions are `themeMid`
+grey and takeaways are `Paired-B`, so the pair reads as one family that colour
+splits into description and argument.
+
+## Backup slides
+
+Put backup material after `\appendix`. Beamer hides those sections from
+`\tableofcontents` but still counts their frames in `\inserttotalframenumber`, so
+slide 3 of a 44-slide talk reports `3 / 50`. The theme snapshots the count where
+`\appendix` runs, writes it to the `.aux`, and reports the main deck's own total on
+the next pass. Backup frames restart at 1 and the footline labels them `Backup N`,
+so you can call out `Backup 2` in questions.
+
+```latex
+\closingframe{Thank you}{your@email.edu}
+
+\appendix
+\begin{frame}{Experimental Setup}
+  Detail held back for questions.
+\end{frame}
+```
+
+The first pass, and a deck with no `\appendix`, fall back to beamer's own number.
+
+## Bibliography
+
+The theme styles bibliography entries but does not choose an engine: use
+`thebibliography`, BibTeX, or biblatex as the document prefers. Items are numbers
+rather than beamer's book icon, entries are `\footnotesize`, and location and note
+lines are `themeMid` grey. When biblatex is loaded the theme sets `\bibfont`
+instead, since biblatex ignores the beamer font roles.
 
 ## Color Palette
 

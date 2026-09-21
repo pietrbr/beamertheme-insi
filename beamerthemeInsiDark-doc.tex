@@ -21,7 +21,7 @@
   \large Version 1.0}
 \author{Pietro Brach del Prever\\
   \small\href{mailto:brachdelprever.p@northeastern.edu}{brachdelprever.p@northeastern.edu}}
-\date{2026/05/07}
+\date{2026/09/21}
 
 \begin{document}
 \maketitle
@@ -31,8 +31,11 @@
 	Northeastern University / IINS presentations.  It features a midnight-navy
 	header strip with a textured background image, the ColorBrewer
 	\texttt{Paired} palette for content, Fira Sans typography, and convenience
-	commands for section separators, closing slides, and event metadata.
+	commands for section separators, statement slides, closing slides, figure
+	takeaways, and event metadata.
 \end{abstract}
+
+\tableofcontents
 
 \section{Requirements}
 
@@ -41,7 +44,12 @@
 	      \texttt{tlmgr install fira}
 	\item \textsf{tikz}, \textsf{pgfplots} (with the \texttt{colorbrewer}
 	      library), \textsf{graphicx} (part of standard TeX Live / MacTeX)
-	\item \textsf{currfile} (part of standard TeX Live / MacTeX)
+	\item \textsf{currfile}, \textsf{etoolbox}, \textsf{microtype} (part of
+	      standard TeX Live / MacTeX)
+	\item \textsf{glossaries} and \textsf{algorithm2e}, only when the matching
+	      theme option is given (Section~\ref{sec:options})
+	\item \textsf{sansmath}, only for the figure companion package
+	      (Section~\ref{sec:figure})
 	\item \texttt{assets/bg-dark.png} and \texttt{assets/logo-insi.png} ---
 	      bundled with this package
 \end{itemize}
@@ -51,7 +59,14 @@ The theme finds its own \texttt{assets/} directory automatically via
 
 \section{Installation}
 
-Symlink the package directory into the personal TEXMF tree (macOS/MacTeX):
+Run the bundled script to symlink the package directory into the personal
+TEXMF tree:
+
+\begin{lstlisting}
+./install.sh              # ./install.sh --uninstall to remove
+\end{lstlisting}
+
+Or by hand (macOS/MacTeX):
 
 \begin{lstlisting}
 ln -s /path/to/beamer-template \
@@ -72,18 +87,53 @@ kpsewhich beamerthemeInsiDark.sty
 \usetheme{InsiDark}
 \end{lstlisting}
 
+\subsection{Theme options}
+\label{sec:options}
+
+\begin{lstlisting}
+\usetheme[acronyms, algorithms]{InsiDark}
+\end{lstlisting}
+
+Neither option is on by default, because each pulls in a heavy package that a
+typical talk does not need.
+
+\begin{description}
+	\item[\texttt{acronyms}] Loads \textsf{glossaries} configured for acronyms
+	      only (\texttt{acronym, nonumberlist, nopostdot, nomain, nogroupskip}),
+	      plus \verb|\glsdisablehyper|.  The theme calls no
+	      \verb|\makeglossaries|, so nothing is printed as a list, \verb|\gls|
+	      expands in place, and the document needs no \textsf{makeindex} pass.
+	      Supply the acronym definitions yourself, in the preamble or through
+	      \verb|\input{acronyms.tex}|:
+	      \begin{lstlisting}
+\newacronym{ran}{RAN}{radio access network}
+\end{lstlisting}
+	\item[\texttt{algorithms}] Loads \textsf{algorithm2e}
+	      (\texttt{ruled, vlined, linesnumbered}) and restyles it for slides:
+	      \verb|\small| body, an \texttt{InsiDark} SemiBold caption, and
+	      \texttt{themeMid} line numbers.  Use \verb|\begin{algorithm}[H]| inside
+	      a frame.
+\end{description}
+
 \section{Metadata commands}
 
 Standard Beamer metadata (\verb|\title|, \verb|\subtitle|, \verb|\author|,
-\verb|\institute|, \verb|\date|) is used as usual.  The theme adds one extra
-command:
+\verb|\institute|, \verb|\date|) is used as usual.  The theme adds two
+preamble commands:
 
-\begin{quote}
-	\verb|\event{|\textit{name}\verb|}|
-\end{quote}
-
-Sets the conference or event name shown on the title page below the institute
-line.
+\begin{description}
+	\item[\texttt{\textbackslash event\{}\textit{name}\texttt{\}}] Sets the
+	      conference or event name shown on the title page below the institute
+	      line.
+	\item[\texttt{\textbackslash addlogo\{}\textit{graphics}\texttt{\}}] Stacks a
+	      partner mark under the INSI monogram, flush right with it, on the title
+	      and closing slides.  Call it once per mark, in the order the marks
+	      should appear.  \verb|\nulogosep| (default \texttt{0.5em}) is the gap
+	      between stacked logos.
+	      \begin{lstlisting}
+\addlogo{\includegraphics[height=0.07\paperheight]{logo-institute}}
+\end{lstlisting}
+\end{description}
 
 \section{Slide commands}
 
@@ -113,6 +163,35 @@ centered in white.  Call it immediately after \verb|\section{...}|:
 \sectionframe
 \end{lstlisting}
 
+The size comes from the \texttt{section title} Beamer font, so a deck with long
+section names can dial it back without redefining \verb|\sectionframe|.
+
+\subsection{\texttt{\textbackslash statementframe[title]\{line\}}}
+
+A dark gradient slide carrying one line, right-aligned and large: the
+rhetorical beat between sections, a step above a section divider.  The frame
+title is optional.
+
+\begin{lstlisting}
+\statementframe[Where this leaves us]{The RIC decides in milliseconds
+  what the network takes minutes to measure.}
+\end{lstlisting}
+
+Three pieces are exposed separately, for a custom frame that needs only part of
+it:
+
+\begin{description}
+	\item[\texttt{\textbackslash statement[width]\{line\}}] The text block alone
+	      (default width \verb|0.68\textwidth|), styled by the
+	      \texttt{statement} color and font.
+	\item[\texttt{\textbackslash InsiDarkStatementBg}] The gradient-plus-wave
+	      background; use it as a \texttt{background canvas}.
+	\item[\texttt{\textbackslash InsiDarkWaveStrokes}] The wave's stroke list, as
+	      \textit{offset}\texttt{/}\textit{opacity} pairs, where the offset is in
+	      centimetres downward from the topmost stroke.  \verb|\renewcommand| it
+	      to retune the wave.
+\end{description}
+
 \subsection{\texttt{\textbackslash closingframe\{msg\}\{contact\}}}
 
 Inserts a dark closing slide with a large message and a contact line:
@@ -123,15 +202,184 @@ Inserts a dark closing slide with a large message and a contact line:
 
 \subsection{\texttt{\textbackslash InsiDarkBg}}
 
-An \verb|\includegraphics| call that tiles the full-bleed background image
+An \verb|\includegraphics| call that scales the full-bleed background image
 to the slide dimensions.  Use it as the argument to
 \verb|\setbeamertemplate{background canvas}{...}| for any custom dark slide.
 
 \subsection{\texttt{\textbackslash nuLogos}}
 
-Overlays the INSI monogram logo at the top-right corner of the current slide
-using a TikZ \texttt{remember picture, overlay} node.  Used automatically on
-the title slide; can be called on any custom dark frame.
+Overlays the INSI monogram at the top-right corner of the current slide using
+a TikZ \texttt{remember picture, overlay} node, plus any marks added with
+\verb|\addlogo|.  Used automatically on the title and closing slides; can be
+called on any custom dark frame.
+
+\subsection{Backup slides}
+
+Put backup material after \verb|\appendix|.  Beamer hides those sections from
+\verb|\tableofcontents|, but it still counts their frames in
+\verb|\inserttotalframenumber|, so slide 3 of a 44-slide talk reports
+\texttt{3 / 50}.  The theme snapshots the frame count where \verb|\appendix|
+runs, writes it to the \texttt{.aux}, and reports the main deck's own total on
+the next pass.  Backup frames restart at 1, and the footline labels them
+\texttt{Backup~\textit{N}} instead of numbering them out of the main total, so
+\texttt{Backup 2} can be called out in questions.
+
+\begin{lstlisting}
+\closingframe{Thank you}{your@email.edu}
+
+\appendix
+\begin{frame}{Experimental Setup}
+  Detail held back for questions.
+\end{frame}
+\end{lstlisting}
+
+The first pass, and a deck with no \verb|\appendix|, fall back to Beamer's own
+number.
+
+\section{Content}
+
+\subsection{Frame titles and subtitles}
+
+The dark strip at the top of a content slide is drawn by the
+\texttt{background} template and the frame title sits on it, so the title
+carries no fill of its own.  A frame takes a second argument, typeset after the
+title in \texttt{Paired-A} and preceded by a guillemet:
+
+\begin{lstlisting}
+\begin{frame}{Throughput}{measured on the testbed}
+\end{lstlisting}
+
+Display type is not hyphenated: the title page, the frame title, and the
+statement slide forbid both automatic hyphenation and breaking at an explicit
+hyphen, so lines may end short instead.
+
+\subsection{Table of contents}
+
+Entries are marked with a \texttt{Paired-B} square rather than a number, since
+an outline says what the parts are, not which section is the fifth.  Beamer
+hardcodes \verb|\vskip1.5em| between entries, a value tuned for four sections,
+so an eight-section deck runs off the frame; the theme redirects it to
+\verb|\nutocsep| (default \texttt{0.7em}).  The length applies only with
+subsections hidden, which is when Beamer uses that skip.
+
+\subsection{Lists}
+
+A slide carries figures and short lines, not paragraphs, so the article-tuned
+list padding is too loose.  \verb|\tightlist| goes just after
+\verb|\begin{itemize}| or \verb|\begin{enumerate}| and tightens it;
+\verb|\nulistsep| (default \texttt{2pt}) is the \verb|\itemsep| it applies.
+Bullets are plain black, and the three levels are a bullet, an en dash, and a
+smaller bullet.
+
+\begin{lstlisting}
+\begin{itemize}\tightlist
+  \item First key point.
+\end{itemize}
+\end{lstlisting}
+
+\subsection{Blocks}
+
+Three block environments, each a rounded title bar over a separately rounded
+body bar, with the title centered over the body.  An empty title drops the
+title bar instead of leaving a blank coloured strip, which gives a callout that
+needs the box but no label.
+
+\begin{lstlisting}
+\begin{block}{Definition}      % nuGold title bar
+  Formal statement.
+\end{block}
+\begin{alertblock}{Key Result} % Paired-E title bar
+  Main contribution.
+\end{alertblock}
+\begin{exampleblock}{Example}  % Paired-C title bar
+  Concrete illustration.
+\end{exampleblock}
+\begin{block}{}
+  Body-only callout: no title bar.
+\end{block}
+\end{lstlisting}
+
+Each body is a 25\,\% tint of its title colour.  \verb|\nublockpad| (default
+\texttt{0.5em}) scales the inset between a bar's coloured edge and its text;
+the body bar takes twice the title bar's share of it.
+
+\subsection{\texttt{narrow}}
+
+\verb|\begin{narrow}[<width>]| (default \verb|0.7\textwidth|) centers a
+width-limited \texttt{minipage}.  A \texttt{minipage} sets \verb|\textwidth|,
+and Beamer sizes blocks, figures, and tables from \verb|\textwidth|, so
+anything inside narrows to match.
+
+\begin{lstlisting}
+\begin{narrow}[0.5\textwidth]
+  \begin{block}{Narrow}
+    Sized from the minipage, not the slide.
+  \end{block}
+\end{narrow}
+\end{lstlisting}
+
+\subsection{Figure captions and takeaways}
+
+Two ranks of text sit under a figure.  The caption says what you are looking
+at; it belongs to the float, so it stays a real \verb|\caption|.  The takeaway
+says why it matters; it is the argument of the slide, it appears under tables
+and lists too, and a float has only one caption slot, so
+\verb|\takeaway{...}| is a free-standing box outside the figure.
+
+\begin{lstlisting}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{plot}
+  \caption{Goodput against offered load.}
+\end{figure}
+\takeaway{The baseline saturates at 30 Mbps; the proposed scheme does not.}
+\end{lstlisting}
+
+A slide has no list of figures and no cross-references, so the theme prints the
+caption text alone, with no \texttt{Figure~\textit{N}:} label and no separator.
+Both ranks are set in the same size and weight, so the pair reads as one
+family; colour is what separates them.  A caption is \texttt{themeMid} grey and
+describes the figure, a takeaway is \texttt{Paired-B} and argues from it.
+
+\subsection{Font weights}
+
+The body default is Fira Sans Light, and Fira carries several weights between
+it and bold.  NFSS has no series key for the middle ones, so the theme exposes
+the two worth reaching for, plus SemiBold:
+
+\begin{center}
+	\begin{tabular}{lll}
+		\toprule
+		Declaration            & Text command              & Weight              \\
+		\midrule
+		\verb|\regularseries|  & \verb|\textregular{...}|  & Regular, one step up from Light \\
+		\verb|\mediumseries|   & \verb|\textmedium{...}|   & Medium, two steps up            \\
+		\verb|\sbseries|       & \verb|\textsb{...}|       & SemiBold, one notch under bold   \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+\verb|\mdseries| is not among them: in NFSS it means series \texttt{m}, which
+the \texttt{light} option of \textsf{FiraSans} maps back to Light.
+
+\subsection{Hyperlinks}
+
+Beamer leaves links uncoloured, and \texttt{structure} is near-black, so a URL
+or a citation would be indistinguishable from body text.  The theme colours the
+outward-facing ones \texttt{Paired-B} and keeps a URL in the body face with
+\verb|\urlstyle{same}|.  Internal navigation links take xcolor's \texttt{.},
+the current colour, so \textsf{hyperref} repaints nothing and the surrounding
+template decides: the outline keeps its \texttt{section in toc} colour, and the
+white section head on the dark section page survives.
+
+\subsection{Bibliography}
+
+The theme styles bibliography entries but does not choose an engine, so the
+document is free to use \texttt{thebibliography}, BibTeX, or
+\textsf{biblatex}.  Items are numbers rather than Beamer's book icon, entries
+are \verb|\footnotesize|, and location and note lines are \texttt{themeMid}
+grey.  When \textsf{biblatex} is loaded the theme sets \verb|\bibfont| instead,
+because \textsf{biblatex} ignores the Beamer font roles.
 
 \section{Color palette}
 
@@ -142,94 +390,88 @@ via the \textsf{pgfplots} \texttt{colorbrewer} library.  They are available as
 Light/dark pairs: A/B (blue), C/D (green), E/F (red), G/H (orange),
 I/J (purple), K/L (yellow / brown).
 
-The theme also defines a handful of reserved neutrals and a title-slide
-accent:
+The theme also defines a handful of reserved neutrals and an accent:
 
 \begin{center}
 	\renewcommand{\arraystretch}{1.3}
 	\begin{tabular}{lll}
 		\toprule
-		Name              & Hex               & Role                                           \\
+		Name              & Hex               & Role                                        \\
 		\midrule
-		\texttt{InsiDark} & \texttt{\#01091E} & Title / section / header background            \\
-		\texttt{themeMid} & \texttt{\#666666} & Footer / caption text                          \\
-		\texttt{themeBg}  & \texttt{\#F4F4F4} & Neutral block body background                  \\
-		\texttt{nuGold}   & \texttt{\#FDBB45} & Title-slide subtitle accent (title slide only) \\
+		\texttt{InsiDark} & \texttt{\#01091E} & Title / section / header background         \\
+		\texttt{themeMid} & \texttt{\#666666} & Footer / caption text                       \\
+		\texttt{themeBg}  & \texttt{\#F4F4F4} & Neutral surface                             \\
+		\texttt{nuGold}   & \texttt{\#FDBB45} & Accent: title-slide subtitle, default block \\
 		\bottomrule
 	\end{tabular}
 \end{center}
 
-Default block colors are \texttt{Paired-B} (info / standard block),
-\texttt{Paired-F} (alert), and \texttt{Paired-D} (example).  Itemize and
+Block title bars are \texttt{nuGold} (default), \texttt{Paired-E} (alert), and
+\texttt{Paired-C} (example).  Every bar carries dark text rather than white,
+which is what fixes the colour choice: white on gold is 1.7:1 and dark navy on
+gold is 11.4:1, black on \texttt{Paired-E} is 10.1:1 and on \texttt{Paired-C}
+15.3:1, where white on the strong \texttt{Paired-D} green is only 3.6:1.  So
+alert and example titles sit on the light half of their pair, not the strong
+one.  Alerted text (\verb|\alert{...}|) is \texttt{Paired-F}.  Itemize and
 enumerate bullets are plain black.
+
+\section{Lengths}
+
+Every length is set with \verb|\setlength| in the document preamble.
+
+\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{lll}
+		\toprule
+		Length                & Default            & Controls                                     \\
+		\midrule
+		\verb|\nuframeht|     & \texttt{3.15em}    & Height of the dark frame-title strip         \\
+		\verb|\nutocsep|      & \texttt{0.7em}     & Gap between \verb|\tableofcontents| entries  \\
+		\verb|\nulistsep|     & \texttt{2pt}       & \verb|\itemsep| applied by \verb|\tightlist| \\
+		\verb|\nublockpad|    & \texttt{0.5em}     & Inset inside a block bar                     \\
+		\verb|\nulogosep|     & \texttt{0.5em}     & Gap between stacked logos                    \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+The background clip follows \verb|\nuframeht|: the shift that reveals the
+bottom strip of the image is computed at begin-document, once
+\verb|\paperheight| is known.
+
+\section{Standalone figures}
+\label{sec:figure}
+
+\textsf{beamerthemeInsiDark-figure} is the companion package for the
+externalized-TikZ model: one PDF per figure, each compiled on its own, which
+the deck then \verb|\includegraphics|.  Such a figure is not a Beamer document,
+so it cannot \verb|\usetheme{InsiDark}| and falls back to Computer Modern at
+\texttt{OT1}.  Two things then break, and the theme causes both: the face stops
+matching the slide, and the \texttt{OT1}/\texttt{T1} mismatch misrenders
+\texttt{<}, \texttt{>}, \texttt{|} and accented characters, in the figures
+only.  Load the package from the figure's preamble, not the deck's:
+
+\begin{lstlisting}
+\usepackage{beamerthemeInsiDark-figure}
+\end{lstlisting}
+
+It sets \texttt{T1}, Fira Sans Light, and sans math (\textsf{sansmath}), and
+nothing else: a figure's data colours and plot styles belong to the document.
+\texttt{install.sh} symlinks the whole directory into \texttt{TEXMFHOME}, so
+there is no separate install step; on Overleaf, upload the file into the
+project alongside the theme.
 
 \section{Full example}
 
-The file \texttt{main.tex} (included in this package) is a complete working
-template demonstrating all slide types.  It compiles with:
+The file \texttt{main.tex} in this package is a complete working template that
+demonstrates every slide type and command described above: title slide,
+outline, section separators, a statement slide, frame subtitles, font weights,
+two columns, all four block forms, \texttt{narrow}, a \textsf{pgfplots} figure
+with caption and takeaway, a table, an \textsf{algorithm2e} listing, a
+bibliography, the closing slide, and backup slides after \verb|\appendix|.  It
+compiles with:
 
 \begin{lstlisting}
-pdflatex main.tex
-\end{lstlisting}
-
-The minimal skeleton:
-
-\begin{lstlisting}
-\documentclass[aspectratio=169, 10pt]{beamer}
-\usepackage{microtype}
-\usetheme{InsiDark}
-
-\title{Presentation Title}
-\subtitle{A Concise Subtitle}
-\author[P.\ Brach del Prever]{Pietro Brach del Prever}
-\institute[NU / IINS]{Northeastern University \\
-                      Institute for Intelligent Networked Systems}
-\event{IEEE INFOCOM 2026 Workshop}
-\date{May 2026}
-
-\begin{document}
-
-% Title slide
-{
-  \setbeamertemplate{background}{}
-  \setbeamertemplate{background canvas}{\InsiDarkBg}
-  \setbeamertemplate{footline}{}
-  \begin{frame}[plain]\titlepage\end{frame}
-}
-
-\section{Introduction}
-\sectionframe
-
-\begin{frame}{Motivation}
-  \begin{itemize}
-    \item First key point.
-    \item Second key point.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Blocks}
-  \begin{block}{Definition}
-    Formal statement.
-  \end{block}
-  \begin{alertblock}{Key Result}
-    Main contribution.
-  \end{alertblock}
-  \begin{exampleblock}{Example}
-    Concrete illustration.
-  \end{exampleblock}
-  \begin{block}{}
-    An empty title drops the title bar: a body-only callout.
-  \end{block}
-  \begin{narrow}[0.5\textwidth]
-    \begin{block}{Narrow}
-      \texttt{narrow} tightens anything sized from \texttt{\textbackslash textwidth}.
-    \end{block}
-  \end{narrow}
-\end{frame}
-
-\closingframe{Thank you}{your@email.edu}
-
-\end{document}
+latexmk -pdf main.tex
 \end{lstlisting}
 
 \section{License}

@@ -5,14 +5,22 @@
 \usepackage{graphicx}
 
 % __ Theme _____________________________________________________________________
-\usetheme{InsiDark}
+\usetheme[acronyms, algorithms]{InsiDark}
+\pgfplotsset{compat=1.18}
+
+% __ Acronyms (theme option `acronyms') ________________________________________
+\newacronym{ran}{RAN}{radio access network}
+\newacronym{ric}{RIC}{RAN intelligent controller}
 
 % __ Metadata __________________________________________________________________
 \title{Presentation Title}
 \subtitle{A Concise Subtitle}
 \author[P.\ Brach del Prever]{Pietro Brach del Prever}
 \institute[NU / INSI]{Northeastern University \\ Institute for Intelligent Networked Systems}
+\event{IEEE INFOCOM 2026 Workshop on 6G AI-RAN}
 \date{April 2026}
+
+\addlogo{\includegraphics[height=0.07\paperheight]{logo-institute}}
 
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{document}
@@ -28,21 +36,42 @@
 \end{frame}
 }
 
+% __ Outline ___________________________________________________________________
+\begin{frame}{Outline}
+	\tableofcontents
+\end{frame}
+
 % __ Section separator _________________________________________________________
 \section{Introduction}
 \sectionframe
 
 % __ Content slide _____________________________________________________________
 \begin{frame}{Motivation}
-	\begin{itemize}
-		\item First key point.
+	\begin{itemize}\tightlist
+		\item First key point about the \gls{ran}.
 		\item Second key point with more detail.
 		      \begin{itemize}
 			      \item Supporting sub-point.
 		      \end{itemize}
-		\item Third point.
+		\item Third point, \alert{with an alerted phrase}.
 	\end{itemize}
 \end{frame}
+
+% __ Frame subtitle and font weights ___________________________________________
+\begin{frame}{Typography}{frame subtitle after the title}
+	Fira Sans Light is the body default; three weights sit between it and bold.
+	\begin{itemize}\tightlist
+		\item \textregular{Regular} --- one step up from the body.
+		\item \textmedium{Medium} --- two steps up.
+		\item \textsb{SemiBold} --- one notch under \textbf{bold}.
+	\end{itemize}
+	\medskip
+	A URL is body text: \url{https://github.com}.
+\end{frame}
+
+% __ Statement slide ___________________________________________________________
+\statementframe[Where this leaves us]{The \gls{ric} decides in milliseconds
+	what the network takes minutes to measure.}
 
 % __ Two-column slide __________________________________________________________
 \begin{frame}{System Overview}
@@ -60,23 +89,58 @@
 
 % __ Block slide _______________________________________________________________
 \begin{frame}{Blocks}
-	\begin{block}{Definition}            % nuBlue header
+	\begin{block}{Definition}
 		Formal definition or theorem.
 	\end{block}
-	\vskip0.5em
-	\begin{alertblock}{Key Result}       % nuTeal header
+	\begin{alertblock}{Key Result}
 		The main contribution or takeaway.
 	\end{alertblock}
-	\vskip0.5em
-	\begin{exampleblock}{Example}        % nuGold header, InsiDark text
+	\begin{exampleblock}{Example}
 		A concrete illustrative example.
 	\end{exampleblock}
+	\begin{block}{}
+		An empty title drops the title bar: a body-only callout.
+	\end{block}
+\end{frame}
+
+% __ Narrowed content __________________________________________________________
+\begin{frame}{Narrow}
+	\begin{narrow}[0.6\textwidth]
+		\begin{block}{Sized from \texttt{\textbackslash textwidth}}
+			A \texttt{narrow} minipage resets \texttt{\textbackslash textwidth}, so blocks,
+			figures, and tables inside it shrink to match.
+		\end{block}
+	\end{narrow}
 \end{frame}
 
 % __ Section separator _________________________________________________________
 \section{Results}
 \sectionframe
 
+% __ Figure with caption and takeaway __________________________________________
+\begin{frame}{Throughput}
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+					width=0.62\textwidth, height=0.42\textheight,
+					xlabel={Offered load (Mbps)}, ylabel={Goodput (Mbps)},
+					legend pos=north west, legend cell align=left,
+					tick label style={font=\footnotesize},
+					label style={font=\footnotesize},
+					legend style={font=\footnotesize, draw=none, fill=none},
+				]
+				\addplot[Paired-B, thick, mark=*]      coordinates {(10,9.6)(20,18.9)(30,25.1)(40,27.4)};
+				\addplot[Paired-F, thick, mark=square] coordinates {(10,9.8)(20,19.5)(30,29.0)(40,37.2)};
+				\legend{Baseline, Proposed}
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Goodput against offered load, averaged over ten runs.}
+	\end{figure}
+	\takeaway{The baseline saturates at 30~Mbps; the proposed scheme does not.}
+\end{frame}
+
+% __ Table with takeaway _______________________________________________________
 \begin{frame}{Results}
 	\begin{table}
 		\centering
@@ -89,9 +153,47 @@
 			\bottomrule
 		\end{tabular}
 	\end{table}
+	\takeaway{Metric A drops by 18\% while Metric B gains 10\%.}
+\end{frame}
+
+% __ Algorithm (theme option `algorithms') _____________________________________
+\begin{frame}{Scheduler}
+	\begin{narrow}[0.72\textwidth]
+		\begin{algorithm}[H]
+			\caption{Greedy slice assignment}
+			\KwIn{Slice demands $d_1, \dots, d_n$; capacity $C$}
+			\KwOut{Assignment $a$}
+			Sort slices by descending $d_i$\;
+			\ForEach{slice $i$}{
+				\If{$d_i \le C$}{
+					$a_i \gets d_i$\;
+					$C \gets C - d_i$\;
+				}
+			}
+			\Return $a$\;
+		\end{algorithm}
+	\end{narrow}
+\end{frame}
+
+% __ References ________________________________________________________________
+\begin{frame}[allowframebreaks]{References}
+	\begin{thebibliography}{9}
+		\bibitem{example2026}
+		A.~Author and B.~Author,
+		\newblock \emph{A Paper Title That Runs Onto a Second Line}.
+		\newblock IEEE Transactions on Networking, 2026.
+	\end{thebibliography}
 \end{frame}
 
 % __ Closing slide _____________________________________________________________
 \closingframe{Thank you}{brachdelprever.p@northeastern.edu}
+
+% __ Backup slides _____________________________________________________________
+% \appendix keeps these out of the main frame total; the footline reads "Backup N".
+\appendix
+
+\begin{frame}{Experimental Setup}
+	Detail held back for questions.
+\end{frame}
 
 \end{document}
