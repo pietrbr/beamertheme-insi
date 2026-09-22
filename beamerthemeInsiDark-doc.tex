@@ -7,6 +7,11 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 
+% The manual sets many \verb literals in justified prose, and \verb forbids a
+% break inside itself, so several paragraphs have no feasible line breaking without
+% extra stretch.
+\setlength{\emergencystretch}{3em}
+
 \lstset{
   basicstyle=\ttfamily\small,
   backgroundcolor=\color{gray!10},
@@ -28,7 +33,7 @@
 
 \begin{abstract}
 	\textsf{beamerthemeInsiDark} is a minimal dark Beamer theme for
-	Northeastern University / IINS presentations.  It features a midnight-navy
+	Northeastern University / INSI presentations.  It features a midnight-navy
 	header strip with a textured background image, the ColorBrewer
 	\texttt{Paired} palette for content, Fira Sans typography, and convenience
 	commands for section separators, statement slides, closing slides, figure
@@ -216,11 +221,10 @@ called on any custom dark frame.
 \subsection{Backup slides}
 
 Put backup material after \verb|\appendix|.  Beamer hides those sections from
-\verb|\tableofcontents|, but it still counts their frames in
-\verb|\inserttotalframenumber|, so slide 3 of a 44-slide talk reports
-\texttt{3 / 50}.  The theme snapshots the frame count where \verb|\appendix|
-runs, writes it to the \texttt{.aux}, and reports the main deck's own total on
-the next pass.  Backup frames restart at 1, and the footline labels them
+the table of contents and records the main deck's frame total there, so slide 3
+of a 44-slide talk with six backup slides reports \texttt{3 / 44} rather than
+\texttt{3 / 50}.  The footline reads that total from Beamer's own
+\verb|\insertmainframenumber|, and labels backup frames
 \texttt{Backup~\textit{N}} instead of numbering them out of the main total, so
 \texttt{Backup 2} can be called out in questions.
 
@@ -233,8 +237,10 @@ the next pass.  Backup frames restart at 1, and the footline labels them
 \end{frame}
 \end{lstlisting}
 
-The first pass, and a deck with no \verb|\appendix|, fall back to Beamer's own
-number.
+The total travels through the \texttt{.nav} file, so it is correct from the
+second pass onward.  A deck with no \verb|\appendix| reports
+\verb|\inserttotalframenumber|, which is what Beamer defines
+\verb|\insertmainframenumber| to be.
 
 \section{Content}
 
@@ -268,6 +274,8 @@ A slide carries figures and short lines, not paragraphs, so the article-tuned
 list padding is too loose.  \verb|\tightlist| goes just after
 \verb|\begin{itemize}| or \verb|\begin{enumerate}| and tightens it;
 \verb|\nulistsep| (default \texttt{2pt}) is the \verb|\itemsep| it applies.
+The gap above and below a list is out of its reach, because \verb|\list| spends
+\verb|\topsep| and \verb|\parsep| before the first body token is read.
 Bullets are plain black, and the three levels are a bullet, an en dash, and a
 smaller bullet.
 

@@ -1,6 +1,6 @@
 # beamerthemeInsiDark
 
-A minimal dark Beamer theme for Northeastern University / IINS presentations.
+A minimal dark Beamer theme for Northeastern University / INSI presentations.
 Dark navy background, ColorBrewer Paired palette for content, Fira Sans typography.
 
 ## Requirements
@@ -95,7 +95,7 @@ into each project.
 | `\sbseries` / `\textsb{...}`           | Fira Sans SemiBold, one notch under bold                                                                                          |
 | `\takeaway{text}`                      | Coloured line under a figure/table saying why it matters; styled by the `takeaway` color/font                                     |
 | `\nuframeht`                           | Height of the dark frame-title strip (default `3.15em`); the background clip follows it                                           |
-| `\nublockpad`                          | Inset between a block bar's coloured edge and its text (default `0.5em`); the body bar takes twice the title bar's share          |
+| `\nublockpad`                          | Scales the inset between a block bar's coloured edge and its text (default `0.5em`); the body bar takes twice the title bar's share          |
 
 ## Frame subtitles
 
@@ -130,11 +130,11 @@ splits into description and argument.
 ## Backup slides
 
 Put backup material after `\appendix`. Beamer hides those sections from
-`\tableofcontents` but still counts their frames in `\inserttotalframenumber`, so
-slide 3 of a 44-slide talk reports `3 / 50`. The theme snapshots the count where
-`\appendix` runs, writes it to the `.aux`, and reports the main deck's own total on
-the next pass. Backup frames restart at 1 and the footline labels them `Backup N`,
-so you can call out `Backup 2` in questions.
+`\tableofcontents` and records the main deck's frame total there, so slide 3 of a
+44-slide talk with six backup slides reports `3 / 44` and not `3 / 50`. The
+footline reads that total from beamer's own `\insertmainframenumber`, and labels
+backup frames `Backup N` instead of numbering them out of it, so you can call out
+`Backup 2` in questions.
 
 ```latex
 \closingframe{Thank you}{your@email.edu}
@@ -145,7 +145,9 @@ so you can call out `Backup 2` in questions.
 \end{frame}
 ```
 
-The first pass, and a deck with no `\appendix`, fall back to beamer's own number.
+The total travels through the `.nav` file, so it is correct from the second pass
+onward. A deck with no `\appendix` reports `\inserttotalframenumber`, which is
+what beamer defines `\insertmainframenumber` to be.
 
 ## Bibliography
 
