@@ -4,7 +4,7 @@
 set -eu
 
 NAME="beamerthemeInsiDark"
-SRC="$(cd "$(dirname "$0")" && pwd)"
+SRC="$(cd "$(dirname "$0")" && pwd)/tex/latex/$NAME"
 DEST="$(kpsewhich -var-value TEXMFHOME)/tex/latex/$NAME"
 
 if [ "${1:-}" = "--uninstall" ]; then

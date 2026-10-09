@@ -20,7 +20,7 @@ Run the install script to symlink the theme into your personal TEXMF tree
 ./install.sh              # link; ./install.sh --uninstall to remove
 ```
 
-Or by hand: `ln -s "$(pwd)" ~/Library/texmf/tex/latex/beamerthemeInsiDark`.
+Or by hand: `ln -s "$(pwd)/tex/latex/beamerthemeInsiDark" ~/Library/texmf/tex/latex/beamerthemeInsiDark`.
 
 After that, `\usetheme{InsiDark}` works from any document.
 
@@ -210,7 +210,7 @@ across the boundary:
 
 It sets `T1`, Fira Sans Light, and sans math (`sansmath`), and nothing else --
 a figure's data colours and plot styles belong to the document. `install.sh`
-symlinks the whole repo into `TEXMFHOME`, so no separate install step is needed;
+symlinks `tex/latex/beamerthemeInsiDark` into `TEXMFHOME`, so no separate install step is needed;
 on Overleaf, upload this file into the project alongside the theme.
 
 ## License
